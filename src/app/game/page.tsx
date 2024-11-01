@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getWord, checkWord } from '../server/game'; // Adjust the path as necessary
 
 const GamePage: React.FC = () => {
-    const [letters, setLetters] = useState<string[]>(Array(5).fill(''));
+    const [letters, setLetters] = useState<string[]>([]);
     const [word, setWord] = useState<string>('');
     const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
     const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -15,6 +15,7 @@ const GamePage: React.FC = () => {
                 const fetchedWord = await getWord();
                 console.log('Fetched word:', fetchedWord); // Log the fetched word
                 setWord(fetchedWord);
+                setLetters(Array(fetchedWord.length).fill(''));
             } catch (error) {
                 console.error('Error fetching word:', error);
             }
@@ -44,7 +45,7 @@ const GamePage: React.FC = () => {
 
             if (!isValid) {
                 // Clear the textboxes and reset cursor position
-                setLetters(Array(5).fill(''));
+                setLetters(Array(word.length).fill(''));
                 inputRefs.current[0]?.focus();
             }
         } else if (event.key === 'Backspace' && !letters[index]) {
@@ -55,7 +56,7 @@ const GamePage: React.FC = () => {
     };
 
     const handleFirstInputFocus = () => {
-        setLetters(Array(5).fill(''));
+        setLetters(Array(word.length).fill(''));
     };
 
     return (
