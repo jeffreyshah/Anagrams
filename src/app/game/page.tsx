@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react';
-import { getWord, checkWord } from '../server/game'; // Adjust the path as necessary
+import { getWord, checkWord } from '../server/game';
+import "../style.css" // Adjust the path as necessary
+import Link from 'next/link';
 
 const GamePage: React.FC = () => {
     const [letters, setLetters] = useState<string[]>([]);
@@ -79,8 +81,9 @@ const GamePage: React.FC = () => {
                 ))}
             </div>
             {isWordValid !== null && (
-                <div>
-                    {isWordValid ? 'The word is valid!' : 'The word is not valid.'}
+                <div className='game-over-div'>
+                      {isWordValid ? 'The word is valid!' : 'The word is not valid.'}
+                      {isWordValid ? <Link href="/game" className='game-button'onClick={() => window.location.reload()}>Play again</Link> : null}
                 </div>
             )}
         </div>

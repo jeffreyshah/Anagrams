@@ -1,7 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Habibi&family=Kumar+One+Outline&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jacques+Francois+Shadow&display=swap');
 
 body {
-  font-family: "Habibi", serif;
+  font-family: "Inria Serif", serif;
   font-weight: 400;
   font-style: normal;
   background-color: #e5e1d4;
@@ -24,7 +24,7 @@ body {
 }
 
 .tilted-letter {
-  font-family: "Kumar One Outline", system-ui;
+  font-family: "Jacques Francois Shadow", serif;
   font-weight: 400;
   font-style: normal;
   display: inline-block;
@@ -37,6 +37,7 @@ body {
 
 .game-button {
   background-color: #e5e1d4;
+  color: #000000;
   border: 2px solid #000000;
   padding: 10px 20px;
   font-size: 18px;
@@ -85,4 +86,11 @@ body {
     font-size: 16px;
     padding: 8px 16px;
   }
+}
+
+.game-over-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
