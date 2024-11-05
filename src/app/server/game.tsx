@@ -16,5 +16,9 @@ export const checkWord = async (word1: string, word2: string): Promise<boolean |
 
 export const getWord = async (): Promise<string> => {
     const randomIndex = Math.floor(Math.random() * words.words.length);
-    return words.words[randomIndex];
+    return scrambleWord(words.words[randomIndex]);
 };
+
+export const scrambleWord = (word: string): string => {
+    return word.split('').sort(() => Math.random() - 0.5).join('');
+}

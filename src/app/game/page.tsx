@@ -87,7 +87,7 @@ const GamePage: React.FC = () => {
       </div>
       {isWordValid !== null && (
         <div className="game-over-div">
-          {isWordValid ? "The word is valid!" : "The word is not valid."}
+          {isWordValid ? "The word is valid! +2000pts" : "The word is not valid."}
           {isWordValid ? (
             <Link
               href="/game"
