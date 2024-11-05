@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jacques+Francois+Shadow&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Jacques+Francois+Shadow&display=swap");
 
 body {
   font-family: "Inria Serif", serif;
@@ -66,15 +66,29 @@ body {
   font-size: 48px;
   font-weight: bold;
   position: relative;
+  padding-bottom: 50px;
 }
 
 .game-container {
-  padding-bottom: 50%;
+  flex-grow: 1;
 }
 
 .game-word {
   font-size: 40px;
   padding-bottom: 30px;
+}
+
+.game-input {
+  height: 80px;
+  width: 70px;
+  margin-right: 20px;
+  text-align: center;
+  font-family: "Inria Serif", serif;
+  font-size: 60px;
+  color: #000000;
+  background-color: #e5e1d4;
+  border: 2px solid #000000;
+  border-radius: 5px;
 }
 
 @media screen and (max-width: 600px) {
@@ -93,4 +107,5 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-grow: 1;
 }
