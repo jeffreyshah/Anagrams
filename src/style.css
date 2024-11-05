@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Habibi&family=Kumar+One+Outline&display=swap");
+
 body {
   font-family: "Habibi", serif;
   font-weight: 400;
@@ -11,6 +13,7 @@ body {
   padding: 0;
   box-sizing: border-box;
   text-align: center;
+  color: #000000;
 }
 
 .container {
@@ -18,12 +21,6 @@ body {
   padding: 100px 200px;
   border-radius: 10px;
   display: inline-block;
-}
-
-.game-title {
-  font-size: 48px;
-  font-weight: bold;
-  position: relative;
 }
 
 .tilted-letter {
@@ -35,7 +32,7 @@ body {
 }
 
 .button-container {
-  margin-top: 20px;
+  margin-top: 20%;
 }
 
 .game-button {
@@ -55,6 +52,28 @@ body {
 
 .game-button:focus {
   outline: none;
+}
+
+.game-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.game-title {
+  font-size: 48px;
+  font-weight: bold;
+  position: relative;
+}
+
+.game-container {
+  padding-bottom: 50%;
+}
+
+.game-word {
+  font-size: 40px;
+  padding-bottom: 30px;
 }
 
 @media screen and (max-width: 600px) {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getWord, checkWord } from '../server/game'; // Adjust the path as necessary
+import "../../style.css";
 
 const GamePage: React.FC = () => {
     const [letters, setLetters] = useState<string[]>(Array(5).fill(''));
@@ -31,19 +32,30 @@ const GamePage: React.FC = () => {
     };
 
     return (
-        <div>
-            <h1>Game Page</h1>
-            <div>
-                <h2>{word}</h2>
+        <body className="game-page">
+            <h1 className="game-title">SCRAMB<span className="tilted-letter">L</span>ED</h1>
+            <div className="game-container">
+                <h2 className="game-word">{word}</h2>
                 {letters.map((letter, index) => (
-                    <input
+                    <input className="game-input"
                         key={index}
                         type="text"
                         value={letter}
                         onChange={(e) => handleChange(index, e.target.value)}
                         onKeyDown={handleKeyPress}
                         maxLength={1}
-                        style={{ width: '20px', marginRight: '5px' }}
+                        style={{
+                            height: '100px',
+                            width: '90px',
+                            marginRight: '20px',
+                            textAlign: 'center',
+                            fontFamily: 'Habibi, serif',
+                            fontSize: '60px',
+                            color: '#000000',
+                            backgroundColor: '#e5e1d4',
+                            border: '2px solid #000000',
+                            borderRadius: '5px'
+                        }}
                     />
                 ))}
             </div>
@@ -52,7 +64,7 @@ const GamePage: React.FC = () => {
                     {isWordValid ? 'The word is valid!' : 'The word is not valid.'}
                 </div>
             )}
-        </div>
+        </body>
     );
 };
 
