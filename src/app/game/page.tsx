@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { getWord, checkWord } from "../server/game";
+import { getDailyWord, checkWord } from "../server/game";
 import "../style.css"; // Adjust the path as necessary
 import Link from "next/link";
 
@@ -14,7 +14,7 @@ const GamePage: React.FC = () => {
   useEffect(() => {
     const fetchWord = async () => {
       try {
-        const fetchedWord = await getWord();
+        const fetchedWord = await getDailyWord();
         console.log("Fetched word:", fetchedWord); // Log the fetched word
         setWord(fetchedWord);
         setLetters(Array(fetchedWord.length).fill(""));
@@ -49,7 +49,8 @@ const GamePage: React.FC = () => {
       setIsWordValid(isValid);
 
       if (!isValid) {
-        // Clear the textboxes and reset cursor position
+        const invalid= new Audio("/sounds/brick-on-metal.mp3");
+        invalid.play().catch((error) => console.error("Error playing sound:", error));
         setLetters(Array(word.length).fill(""));
         inputRefs.current[0]?.focus();
       }

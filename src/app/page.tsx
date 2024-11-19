@@ -14,8 +14,8 @@ export default function Home() {
           <h1 className="game-title">
             SCRAMB<span className="tilted-letter">L</span>ED
             <div className="button-container">
-              <Link href="/game" className="game-button" id="play-button">Play</Link>
-              <Link href="/" className="game-button" id="join-button">Join</Link>
+              <Link href="/gayman" className="game-button" id="join-button">Play</Link>
+              <Link href="/game" className="game-button" id="play-button">Daily Challenge</Link>
             </div>
           </h1>
         </div>

@@ -4,5 +4,5 @@ document.getElementById("play-button").addEventListener("click", function () {
 });
 
 document.getElementById("join-button").addEventListener("click", function () {
-  alert("Multiplayer will be implemented in the future.");
+  alert("Join button clicked");
 });
