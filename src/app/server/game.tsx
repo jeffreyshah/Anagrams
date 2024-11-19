@@ -48,7 +48,9 @@ export const checkWord = async (word1: string, word2: string): Promise<boolean |
 
 export const getSingleplayerWord = async (): Promise<string> => {
     const randomIndex = Math.floor(Math.random() * words6.words.length);
-    return scrambleWord(words6.words[randomIndex]);
+    const word = words6.words[randomIndex]
+    console.log(`Fetched word: ${word}`)
+    return scrambleWord(word);
 };
 
 const getESTDate = (): string => {
