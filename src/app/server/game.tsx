@@ -1,9 +1,16 @@
 import words6 from './words-6.json';
 import dailyWords from './dailyWords.json';
+type DailyWordEntry = {
+    unscrambled: string;
+    scrambled: string;
+};
+
+const typedDailyWords: Record<string, DailyWordEntry> = dailyWords as Record<string, DailyWordEntry>;
+
 
 export const checkAnyWord = async (inputWord: string, scrambledWord: string): Promise<boolean> => {
-    const normalize = (word: string) =>
-        word ? word.toLowerCase().split('').sort().join('') : '';
+    // const normalize = (word: string) =>
+    //     word ? word.toLowerCase().split('').sort().join('') : '';
 
     // check if the inputWord is a valid subset of scrambledWord
     const isSubset = (input: string, scrambled: string): boolean => {
@@ -63,16 +70,17 @@ const getESTDate = (): string => {
 };
 
 export const getDailyWord = async (): Promise<string> => {
-    const dateString = getESTDate(); // get the current date in EST (or EDT if applicable)
-    const word = dailyWords[dateString];
+    const dateString = getESTDate(); // Get the current date in EST
+    const word = typedDailyWords[dateString];
 
     if (!word) {
         throw new Error(`No word found for date: ${dateString}`);
     }
 
-    console.log(`Fetched word for ${dateString}: ${word["unscrambled"]}`);
-    return word["scrambled"];
+    console.log(`Fetched word for ${dateString}: ${word.unscrambled}`);
+    return word.scrambled;
 };
+
 
 export const scrambleWord = (word: string): string => {
     return word.split('').sort(() => Math.random() - 0.5).join('');
