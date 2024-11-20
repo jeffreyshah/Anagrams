@@ -82,8 +82,11 @@ const Singleplayer: React.FC = () => {
     if (word.length >= 3 && word.length <= 6 && !validWords.has(word)) {
       const isValid = await checkAnyWord(word, scrambledWord);
       if (isValid) {
-        const audio = new Audio("/sounds/toolSwap.mp3");
+
+        const audioFile = word.length === 6 ? "/sounds/reward.mp3" : "/sounds/newArtifact.mp3";
+        const audio = new Audio(audioFile);
         audio.play().catch((error) => console.error("Error playing sound:", error));
+
         setValidWords(new Set(validWords.add(word)));
         const scoreMapping: Record<number, number> = {
           3: 100,
@@ -107,8 +110,8 @@ const Singleplayer: React.FC = () => {
   const triggerShake = () => {
     setShake(true);
     setTimeout(() => {
-      setShake(false); // Reset shake state after animation
-    }, 500); // Matches the duration of the CSS animation
+      setShake(false); 
+    }, 500); 
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -125,6 +128,16 @@ const Singleplayer: React.FC = () => {
       handleSubmitWord();
     }
   };
+
+  useEffect(() => {
+    if(isGameOver) {
+        if(score < 1000) {
+            const audio= new Audio("/sounds/hellnaw.mp3");
+            audio.play().catch((error) => console.error("Error playing audio:", error));
+        }
+      
+    }
+  }, [isGameOver, score]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (!isGameOver) {
