@@ -10,6 +10,7 @@ const GamePage: React.FC = () => {
   const [word, setWord] = useState<string>("");
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  let attempts = 1;
 
   useEffect(() => {
     const fetchWord = async () => {
@@ -53,6 +54,7 @@ const GamePage: React.FC = () => {
         invalid.play().catch((error) => console.error("Error playing sound:", error));
         setLetters(Array(word.length).fill(""));
         inputRefs.current[0]?.focus();
+        attempts = attempts+1;
       }
     } else if (event.key === "Backspace" && !letters[index]) {
       if (index > 0) {
@@ -86,22 +88,20 @@ const GamePage: React.FC = () => {
           />
         ))}
       </div>
-      {isWordValid !== null && (
-        <div className="game-over-div">
-          {isWordValid ? "The word is valid! +2000pts" : "The word is not valid."}
-          {isWordValid ? (
-            <Link
-              href="/game"
-              className="game-button"
-              onClick={() => window.location.reload()}
-            >
-              Play again
-            </Link>
-          ) : null}
-        </div>
-      )}
+      <div className="game-footer">
+        {isWordValid !== null && (
+          <div className="game-over-div">
+            {isWordValid ? `The word is valid! Succeeded in ${attempts} attempt(s)!` : "Try Again!"}
+          </div>
+        )}
+        <Link href="/"
+          className="home-button">
+          Home
+        </Link>
+      </div>
     </body>
   );
+  
 };
 
 export default GamePage;
