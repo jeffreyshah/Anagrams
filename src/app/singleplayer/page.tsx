@@ -187,7 +187,7 @@ const Singleplayer: React.FC = () => {
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
       <div className={`game-content ${shake ? "shake" : ""}`}>
-        <h2 className="game-word">{scrambledWord}</h2>
+        <h2 className="game-word">{scrambledWord.split("").join(" ")}</h2>
         <div className="input-boxes">
           {inputLetters.map((letter, index) => (
             <input
