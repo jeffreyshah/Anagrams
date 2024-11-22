@@ -31,6 +31,7 @@ const GamePage: React.FC = () => {
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
   const [attempts, setAttempts] = useState<number>(1); // Initialize attempts as state
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]); // Allow nulls during initialization
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
 
   // Fetch a new word when the component mounts
   useEffect(() => {
@@ -59,6 +60,7 @@ const GamePage: React.FC = () => {
 
   // Handle input changes and move to the next input field
   const handleChange = (index: number, value: string) => {
+    
     if (value.length <= 1) {
       const newLetters = [...letters];
       newLetters[index] = value;
@@ -83,7 +85,9 @@ const GamePage: React.FC = () => {
       const isValid = await checkWord(formedWord, word);
       console.log("Is " + word + " valid:", isValid); // Log if the word is valid
       setIsWordValid(isValid);
-
+      if (isValid) {
+        setIsGameOver(true);
+      }
       if (!isValid) {
         const invalid = new Audio("/sounds/brick-on-metal.mp3");
         invalid.play().catch((error) =>
@@ -91,7 +95,10 @@ const GamePage: React.FC = () => {
         );
         setLetters(Array(word.length).fill(""));
         inputRefs.current[0]?.focus();
-        setAttempts((prevAttempts) => prevAttempts + 1); // Increment attempts correctly
+        if (formedWord.length == 7) {        
+          setAttempts((prevAttempts) => prevAttempts + 1); // Increment attempts correctly
+        }
+
       }
     } else if (event.key === "Backspace" && !letters[index]) {
       if (index > 0) {
@@ -118,19 +125,21 @@ const GamePage: React.FC = () => {
         <h2 className="game-word">{word}</h2>
         {letters.map((letter, index) => (
         <input
-          className="game-input"
-          key={index}
-          type="text"
-          value={letter}
-          onChange={(e) => handleChange(index, e.target.value)}
-          onKeyDown={(e) => handleKeyPress(e, index)}
-          maxLength={1}
-          ref={(el) => {
-            inputRefs.current[index] = el; // Assign without returning
-          }}
-          onFocus={index === 0 ? handleFirstInputFocus : undefined}
-        />
-      ))}
+            className="game-input"
+            key={index}
+            type="text"
+            value={letter}
+            onChange={(e) => handleChange(index, e.target.value)}
+            onKeyDown={(e) => handleKeyPress(e, index)}
+            maxLength={1}
+            ref={(el) => {
+              inputRefs.current[index] = el; // Assign without returning
+            }}
+            onFocus={index === 0 ? handleFirstInputFocus : undefined}
+            disabled={isGameOver} // Lock the input if the game is over
+          />
+        ))}
+
 
       </div>
       <div className="game-footer">
