@@ -94,8 +94,52 @@ body {
   padding-bottom: 50px;
 }
 
-.game-container {
+.game-container-container {
   flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  grid-template-areas: 
+    "left middle right";
+  width: 100%;
+}
+
+.game-container {
+  grid-area: middle;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.word-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 40px;
+}
+.words-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  grid-area: left;
+}
+
+.game-content {
+  grid-area: middle;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.singleplayer-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height : 100%;
 }
 
 .game-word {
@@ -145,7 +189,7 @@ body {
   padding: 10px 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin: 40px auto; 
-  width: 420px; 
+  width: auto; 
 }
 
 .stats-icon {
