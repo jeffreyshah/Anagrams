@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getSingleplayerWord, checkAnyWord } from "../server/game";
 import "../style.css";
+import Image from 'next/image';
 
 /**
 
@@ -175,8 +176,13 @@ const Singleplayer: React.FC = () => {
     }
   };
 
+  const formattedScore = score.toString().padStart(4, "0");
+
   return (
     <div className="game-container">
+      <button className="home-button" onClick={() => window.location.href = '/'}> 
+        <i className="fas fa-home"></i> 
+      </button>
       <h1 className="game-title">
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
@@ -200,12 +206,20 @@ const Singleplayer: React.FC = () => {
             />
           ))}
         </div>
+        <div className="stats-container">
+          <div className="stats-icon">
+            <img src="/images/lebron.webp" alt="Stats Icon" className="icon-image" />
+          </div>
+          <div className="stats-text">
+            <div className="stats-words">WORDS: {validWords.size} </div>
+            <div className="stats-score">SCORE: {formattedScore}</div>
+          </div>
+        </div>
       </div>
       <div className="timer">Time Left: {timeLeft}s</div>
-      <div className="score">Score: {score}</div>
       {isGameOver && (
         <div className="game-over">
-          Game Over! Your score is {score}
+          Game Over!
           <button className="game-button" onClick={resetGame}>
             Play Again
           </button>
