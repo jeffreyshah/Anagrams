@@ -5,6 +5,26 @@ import { getDailyWord, checkWord } from "../server/game";
 import "../style.css"; // Adjust the path as necessary
 import Link from "next/link";
 
+/**
+ * 
+ * @returns Daily challenge page
+ * 
+ * This component is responsible for rendering the game page as well as handling the game logic.
+ * 
+ * The player can:
+ *    Input letters to form words
+ *    Submit words to check if they are valid
+ *    View the scrambled word
+ *    Play again after the game is over
+ * 
+ * The game:
+ *    Fetches a scrambled word from the server
+ *    Allows the player to input letters to form words
+ *    Checks if the word is valid
+ *    Ends the game when the word is valid
+ * 
+ */
+
 const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
   const [word, setWord] = useState<string>("");
@@ -12,6 +32,7 @@ const GamePage: React.FC = () => {
   const [attempts, setAttempts] = useState<number>(1); // Initialize attempts as state
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]); // Allow nulls during initialization
 
+  // Fetch a new word when the component mounts
   useEffect(() => {
     const fetchWord = async () => {
       try {
@@ -29,6 +50,7 @@ const GamePage: React.FC = () => {
     fetchWord();
   }, []);
 
+  // Handle input changes and move to the next input field
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1) {
       const newLetters = [...letters];
@@ -42,6 +64,9 @@ const GamePage: React.FC = () => {
     }
   };
 
+  // Handle key presses for form submission
+  // Check if the word is valid and log the result
+  // Play a sound effect if the word is invalid
   const handleKeyPress = async (
     event: React.KeyboardEvent<HTMLInputElement>,
     index: number
@@ -68,6 +93,7 @@ const GamePage: React.FC = () => {
     }
   };
 
+  // Handle focus on the first input 
   const handleFirstInputFocus = () => {
     setLetters(Array(word.length).fill(""));
   };

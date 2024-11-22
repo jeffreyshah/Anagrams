@@ -9,8 +9,6 @@ const typedDailyWords: Record<string, DailyWordEntry> = dailyWords as Record<str
 
 
 export const checkAnyWord = async (inputWord: string, scrambledWord: string): Promise<boolean> => {
-    // const normalize = (word: string) =>
-    //     word ? word.toLowerCase().split('').sort().join('') : '';
 
     // check if the inputWord is a valid subset of scrambledWord
     const isSubset = (input: string, scrambled: string): boolean => {
@@ -39,6 +37,7 @@ export const checkAnyWord = async (inputWord: string, scrambledWord: string): Pr
     }
 };
 
+// Check if two words are anagrams of each other using the dictionary API
 export const checkWord = async (word1: string, word2: string): Promise<boolean | null> => {
     const normalize = (word: string) => word ? word.toLowerCase().split('').sort().join('') : '';
     if (normalize(word1) !== normalize(word2)) {
@@ -53,6 +52,7 @@ export const checkWord = async (word1: string, word2: string): Promise<boolean |
     }
 };
 
+// Fetch a scrambled word from the server
 export const getSingleplayerWord = async (): Promise<string> => {
     const randomIndex = Math.floor(Math.random() * words6.words.length);
     const word = words6.words[randomIndex]
@@ -60,6 +60,7 @@ export const getSingleplayerWord = async (): Promise<string> => {
     return scrambleWord(word);
 };
 
+// Get the current date in EST
 const getESTDate = (): string => {
     const now = new Date();
     const utcDate = new Date(now.toISOString());
@@ -69,6 +70,7 @@ const getESTDate = (): string => {
     return dateString;
 };
 
+// Fetch the daily word from the server based on the current date
 export const getDailyWord = async (): Promise<string> => {
     const dateString = getESTDate(); // Get the current date in EST
     const word = typedDailyWords[dateString];
@@ -81,7 +83,7 @@ export const getDailyWord = async (): Promise<string> => {
     return word.scrambled;
 };
 
-
+// Scramble a word by shuffling its letters
 export const scrambleWord = (word: string): string => {
     return word.split('').sort(() => Math.random() - 0.5).join('');
 }
