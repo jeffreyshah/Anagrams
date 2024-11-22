@@ -64,7 +64,6 @@ body {
   color: #000; 
 }
 
-
 .game-footer {
   display: flex;
   justify-content: center;
@@ -141,11 +140,11 @@ body {
   align-items: center;
   justify-content: flex-start; 
   background-color: #ffffff;
-  border: 1px solid #dddddd;
+  border: 1.5px solid #000000;
   border-radius: 12px;
   padding: 10px 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 24px auto; 
+  margin: 40px auto; 
   width: 420px; 
 }
 

@@ -201,12 +201,13 @@ const Singleplayer: React.FC = () => {
               onChange={(e) => handleInputChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               disabled={isGameOver}
-              className={`game-input ${index === currentIndex ? "active" : ""}`}
+              className={`game-input ${shake ? "shake" : ""}`} // Add the shake class here
               autoFocus={index === currentIndex}
             />
           ))}
         </div>
-        <div className="stats-container">
+      </div>
+      <div className="stats-container">
           <div className="stats-icon">
             <img src="/images/lebron.webp" alt="Stats Icon" className="icon-image" />
           </div>
@@ -215,7 +216,6 @@ const Singleplayer: React.FC = () => {
             <div className="stats-score">SCORE: {formattedScore}</div>
           </div>
         </div>
-      </div>
       <div className="timer">Time Left: {timeLeft}s</div>
       {isGameOver && (
         <div className="game-over">
