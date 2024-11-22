@@ -100,11 +100,14 @@ const GamePage: React.FC = () => {
 
   return (
     <body 
-      className="game-page">
+      className="game-container">
       <h1 className="game-title">
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
       <div className="game-container">
+        <button className="home-button" onClick={() => window.location.href = '/'}>
+          <i className="fas fa-home"></i> 
+        </button>
         <h2 className="game-word">{word}</h2>
         {letters.map((letter, index) => (
         <input
@@ -131,9 +134,6 @@ const GamePage: React.FC = () => {
               : "Try Again!"}
           </div>
         )}
-        <Link href="/" className="home-button">
-          Home
-        </Link>
       </div>
     </body>
   );

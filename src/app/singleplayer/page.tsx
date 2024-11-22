@@ -37,11 +37,19 @@ const Singleplayer: React.FC = () => {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [scrambledWord, setScrambledWord] = useState<string>("");
   const [shake, setShake] = useState<boolean>(false); // Shake state
+  const [sounds, setSounds] = useState<{ reward: HTMLAudioElement; newArtifact: HTMLAudioElement; gameOver: HTMLAudioElement } | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-
+  useEffect(() => {
+    setSounds({
+      reward: new Audio("/sounds/reward.mp3"),
+      newArtifact: new Audio("/sounds/newArtifact.mp3"),
+      gameOver: new Audio("/sounds/hellnaw.mp3"),
+    });
+  }, []);
+  
   // Reset the game to its initial state
   const resetGame = async () => {
     setInputLetters(Array(6).fill(""));
@@ -74,7 +82,6 @@ const Singleplayer: React.FC = () => {
       inputRefs.current[0]?.focus();
     }, 0);
   };
-
 
   // Fetch a new word from the server
   useEffect(() => {
@@ -111,11 +118,10 @@ const Singleplayer: React.FC = () => {
     const word = inputLetters.join("").trim();
     if (word.length >= 3 && word.length <= 6 && !validWords.has(word)) {
       const isValid = await checkAnyWord(word, scrambledWord);
-      if (isValid) {
-
-        const audioFile = word.length === 6 ? "/sounds/reward.mp3" : "/sounds/newArtifact.mp3";
-        const audio = new Audio(audioFile);
-        audio.play().catch((error) => console.error("Error playing sound:", error));
+      if (sounds && isValid) {
+        const audioFile = word.length === 6 ? sounds.reward : sounds.newArtifact;
+        audioFile.currentTime = 0
+        audioFile.play().catch((error) => console.error("Error playing sound:", error));
 
         setValidWords(new Set(validWords.add(word)));
         const scoreMapping: Record<number, number> = {
@@ -145,8 +151,6 @@ const Singleplayer: React.FC = () => {
   };
 
   // Handle key presses for backspace and enter
-  // If the backspace key is pressed, clear the current input field
-  // If the enter key is pressed, submit the word
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace" && !isGameOver) {
       const updatedLetters = [...inputLetters];
@@ -165,11 +169,10 @@ const Singleplayer: React.FC = () => {
   // Play a sound effect on game over if the score is less than 1000
   useEffect(() => {
     if(isGameOver) {
-        if(score < 1000) {
-            const audio= new Audio("/sounds/hellnaw.mp3");
-            audio.play().catch((error) => console.error("Error playing audio:", error));
+        if(sounds && score < 1000) {
+          sounds.gameOver.currentTime = 0
+          sounds.gameOver.play().catch((error) => console.error("Error playing audio:", error));
         }
-      
     }
   }, [isGameOver, score]);
 
@@ -192,10 +195,13 @@ const Singleplayer: React.FC = () => {
 
   return (
     <div className="game-container">
+      <button className="home-button" onClick={() => window.location.href = '/'}> 
+        <i className="fas fa-home"></i> 
+      </button>
       <h1 className="game-title">
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
-      <div className={`game-content ${shake ? "shake" : ""}`}>
+      <div className="game-content">
         <h2 className="game-word">{scrambledWord}</h2>
         <div className="input-boxes">
           {inputLetters.map((letter, index) => (
@@ -210,7 +216,7 @@ const Singleplayer: React.FC = () => {
               onChange={(e) => handleInputChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               disabled={isGameOver}
-              className={`game-input ${index === currentIndex ? "active" : ""}`}
+              className={`game-input ${index === currentIndex ? "active" : ""} ${shake ? "shake" : ""}`}
               autoFocus={index === currentIndex}
             />
           ))}
