@@ -7,7 +7,6 @@ export default function Home() {
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>SCRAMBLED!</title>
-        <script src="script.js" defer></script>
       </head>
       <body>
         <div className="container">
