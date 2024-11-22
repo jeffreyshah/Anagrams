@@ -50,6 +50,13 @@ const GamePage: React.FC = () => {
     fetchWord();
   }, []);
 
+  useEffect(() => {
+    // Focus the first input once the word is fetched
+    if (word.length > 0) {
+      inputRefs.current[0]?.focus();
+    }
+  }, [word]);
+
   // Handle input changes and move to the next input field
   const handleChange = (index: number, value: string) => {
     if (value.length <= 1) {
