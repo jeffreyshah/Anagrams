@@ -136,6 +136,52 @@ body {
   flex-grow: 1;
 }
 
+.stats-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; 
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 12px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 24px auto; 
+  width: 420px; 
+}
+
+.stats-icon {
+  flex-shrink: 0;
+  margin-right: 16px; 
+}
+
+.icon-image {
+  width: 90px;
+  height: 80px;
+}
+
+.stats-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+  font-family: "Inria Serif", serif;
+  font-weight: bold;
+}
+
+.stats-words {
+  font-size: 16px; 
+  font-weight: bold;
+  color: #888888;
+  text-transform: uppercase;
+  margin : 0
+}
+
+.stats-score {
+  font-size: 40px; 
+  font-weight: bold; 
+  color: #333333;
+}
+
 .game-input.shake {
   animation: shake 0.5s ease-in-out;
 }
