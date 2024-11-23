@@ -52,7 +52,7 @@ export const checkWord = async (word1: string, word2: string): Promise<boolean |
     }
 };
 
-// Fetch a scrambled word from the server
+// Fetch a random scrambled word from the server
 export const getSingleplayerWord = async (): Promise<string> => {
     const randomIndex = Math.floor(Math.random() * words6.words.length);
     const word = words6.words[randomIndex]

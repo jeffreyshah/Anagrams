@@ -2,47 +2,43 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { getDailyWord, checkWord } from "../server/game";
-import "../style.css"; // Adjust the path as necessary
-import Link from "next/link";
+import "../style.css";
+import Image from "next/image";
 
 /**
- * 
- * @returns Daily challenge page
- * 
- * This component is responsible for rendering the game page as well as handling the game logic.
- * 
- * The player can:
- *    Input letters to form words
- *    Submit words to check if they are valid
- *    View the scrambled word
- *    Play again after the game is over
- * 
- * The game:
- *    Fetches a scrambled word from the server
- *    Allows the player to input letters to form words
- *    Checks if the word is valid
- *    Ends the game when the word is valid
- * 
+ * GamePage Component
+ *
+ * Main component for the daily scrambled word challenge.
+ * This component handles:
+ * - Fetching the daily scrambled word from the server.
+ * - Managing user input and game state.
+ * - Validating the player's submitted word.
+ * - Displaying game results and retry options.
  */
-
 const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
-  const [word, setWord] = useState<string>("");
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [scrambledWord, setScrambledWord] = useState<string>("");
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [attempts, setAttempts] = useState<number>(1);
+  const [shake, setShake] = useState<boolean>(false);
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
-  const [attempts, setAttempts] = useState<number>(1); // Initialize attempts as state
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]); // Allow nulls during initialization
 
-  // Fetch a new word when the component mounts
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  /**
+   * Fetch the daily scrambled word from the server.
+   * - Sets the scrambled word.
+   * - Initializes the letter input boxes.
+   * - Prepares input refs for focusing.
+   */
   useEffect(() => {
     const fetchWord = async () => {
       try {
         const fetchedWord = await getDailyWord();
-        console.log("Fetched word:", fetchedWord); // Log the fetched word
-        setWord(fetchedWord);
+        setScrambledWord(fetchedWord);
         setLetters(Array(fetchedWord.length).fill(""));
-        // Ensure refs array matches the word length
-        inputRefs.current = Array(fetchedWord.length)
-          .fill(null);
+        inputRefs.current = Array(fetchedWord.length).fill(null);
       } catch (error) {
         console.error("Error fetching word:", error);
       }
@@ -50,99 +46,135 @@ const GamePage: React.FC = () => {
     fetchWord();
   }, []);
 
+  /**
+   * Ensures the first input field is focused when the scrambled word changes.
+   * This is triggered when a new word is fetched.
+   */
   useEffect(() => {
-    // Focus the first input once the word is fetched
-    if (word.length > 0) {
+    if (scrambledWord.length > 0) {
       inputRefs.current[0]?.focus();
     }
-  }, [word]);
+  }, [scrambledWord]);
 
-  // Handle input changes and move to the next input field
-  const handleChange = (index: number, value: string) => {
-    if (value.length <= 1) {
-      const newLetters = [...letters];
-      newLetters[index] = value;
-      setLetters(newLetters);
+  /**
+   * Triggers a shake animation for invalid submissions.
+   * - Sets `shake` to true, initiating the CSS shake effect.
+   * - Resets `shake` to false after a short delay.
+   */
+  const triggerShake = () => {
+    setShake(true);
+    setTimeout(() => setShake(false), 500); 
+  };
 
-      // Move to the next input field if it exists
-      if (value && index < inputRefs.current.length - 1) {
+  /**
+   * Handles character input in the letter boxes.
+   * - Updates the current letter at the given index.
+   * - Automatically moves focus to the next input box if valid input is entered.
+   */
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
+  ) => {
+    if (isGameOver) return;
+
+    const value = e.target.value.toLowerCase();
+    if (value.length === 1 && /^[a-z]$/.test(value)) {
+      const updatedLetters = [...letters];
+      updatedLetters[index] = value;
+      setLetters(updatedLetters);
+
+      if (index < scrambledWord.length - 1 && updatedLetters[index + 1] === "") {
+        setCurrentIndex(index + 1);
         inputRefs.current[index + 1]?.focus();
       }
     }
   };
 
-  // Handle key presses for form submission
-  // Check if the word is valid and log the result
-  // Play a sound effect if the word is invalid
-  const handleKeyPress = async (
-    event: React.KeyboardEvent<HTMLInputElement>,
+  /**
+   * Handles keyboard events in the letter boxes.
+   * - Backspace: Deletes the current letter and moves focus backward.
+   * - Enter: Submits the current word for validation.
+   */
+  const handleKeyDown = async (
+    e: React.KeyboardEvent<HTMLInputElement>,
     index: number
   ) => {
-    if (event.key === "Enter") {
+    if (isGameOver) return;
+
+    if (e.key === "Backspace") {
+      const updatedLetters = [...letters];
+      updatedLetters[index] = "";
+      if (index > 0) {
+        updatedLetters[index - 1] = "";
+        setCurrentIndex(index - 1);
+        inputRefs.current[index - 1]?.focus();
+      }
+      setLetters(updatedLetters);
+    } else if (e.key === "Enter") {
       const formedWord = letters.join("");
-      const isValid = await checkWord(formedWord, word);
-      console.log("Is " + word + " valid:", isValid); // Log if the word is valid
+      const isValid = await checkWord(formedWord, scrambledWord);
       setIsWordValid(isValid);
 
-      if (!isValid) {
-        const invalid = new Audio("/sounds/brick-on-metal.mp3");
-        invalid.play().catch((error) =>
-          console.error("Error playing sound:", error)
-        );
-        setLetters(Array(word.length).fill(""));
+      if (isValid) {
+        setIsGameOver(true);
+      } else {
+        triggerShake();
+        if (formedWord.length === scrambledWord.length) {
+          setAttempts((prev) => prev + 1);
+        }
+        setLetters(Array(scrambledWord.length).fill(""));
         inputRefs.current[0]?.focus();
-        setAttempts((prevAttempts) => prevAttempts + 1); // Increment attempts correctly
-      }
-    } else if (event.key === "Backspace" && !letters[index]) {
-      if (index > 0) {
-        inputRefs.current[index - 1]?.focus();
       }
     }
   };
 
-  // Handle focus on the first input 
-  const handleFirstInputFocus = () => {
-    setLetters(Array(word.length).fill(""));
-  };
-
   return (
-    <body 
-      className="game-container">
+    <div className="game-container">
+      <button className="home-button" onClick={() => (window.location.href = "/")}>
+        <i className="fas fa-home"></i>
+      </button>
       <h1 className="game-title">
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
-      <div className="game-container">
-        <button className="home-button" onClick={() => window.location.href = '/'}>
-          <i className="fas fa-home"></i> 
-        </button>
-        <h2 className="game-word">{word}</h2>
-        {letters.map((letter, index) => (
-        <input
-          className="game-input"
-          key={index}
-          type="text"
-          value={letter}
-          onChange={(e) => handleChange(index, e.target.value)}
-          onKeyDown={(e) => handleKeyPress(e, index)}
-          maxLength={1}
-          ref={(el) => {
-            inputRefs.current[index] = el; // Assign without returning
-          }}
-          onFocus={index === 0 ? handleFirstInputFocus : undefined}
-        />
-      ))}
-
+      <div className={`game-content ${shake ? "shake" : ""}`}>
+        <h2 className="game-word">{scrambledWord}</h2>
+        <div className="input-boxes">
+          {letters.map((letter, index) => (
+            <input
+              key={index}
+              type="text"
+              value={letter}
+              maxLength={1}
+              ref={(el) => {
+                inputRefs.current[index] = el;
+              }}
+              onChange={(e) => handleInputChange(e, index)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              disabled={isGameOver}
+              className={`game-input ${shake ? "shake" : ""}`}
+              autoFocus={index === currentIndex}
+            />
+          ))}
+        </div>
       </div>
-      <div className="game-container">
-        {isWordValid !== null && (
-          <div className="game-over">
-            {isWordValid
-              ? `The word is valid! Succeeded in ${attempts} attempt(s)!`
-              : "Try Again!"}
-          </div>
-        )}
+      <div className="stats-container">
+        <div className="stats-text">
+          <div className="stats-attempts">Attempts: {attempts}</div>
+          {isWordValid !== null && (
+            <div className="game-over-message">
+              {isWordValid ? "You unscrambled the word!" : "Try Again!"}
+            </div>
+          )}
+        </div>
       </div>
-    </body>
+      {isGameOver && (
+        <div className="game-over">
+          <button className="game-button" onClick={() => window.location.href = '/'}>
+            Home
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

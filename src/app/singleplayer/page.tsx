@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getSingleplayerWord, checkAnyWord } from "../server/game";
 import "../style.css";
-import Image from 'next/image';
 
 /**
 
@@ -34,7 +33,8 @@ const Singleplayer: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Resets game to initial state (triggered on on play again)
+  // Resets the game state to allow the player to start a new round
+  // Fetches a new scrambled word, resets score and input fields, and restarts the timer.
   const resetGame = async () => {
     setInputLetters(Array(6).fill(""));
     setCurrentIndex(0);
@@ -54,6 +54,7 @@ const Singleplayer: React.FC = () => {
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         const newTime = Math.max(prevTime - 1, 0);
+        // Out of time
         if (newTime === 0) {
           clearInterval(timerRef.current!);
           setIsGameOver(true);
@@ -67,6 +68,8 @@ const Singleplayer: React.FC = () => {
     }, 0);
   };
 
+  // Fetches the scrambled word from the server and starts the countdown timer.
+  // Initializes the game state when the component mounts.
   useEffect(() => {
     const fetchWord = async () => {
       try {
@@ -94,7 +97,8 @@ const Singleplayer: React.FC = () => {
     };
   }, []);
 
-  // Check if the word is valid and update score. Trigger shake animation on invalid word
+  // Validates the submitted word and updates the player's score if valid.
+  // Triggers a shake animation for invalid words or duplicate submissions.
   const handleSubmitWord = async () => {
     const word = inputLetters.join("").trim();
     if (word.length >= 3 && word.length <= 6 && !validWords.has(word)) {
@@ -115,16 +119,20 @@ const Singleplayer: React.FC = () => {
         const points = scoreMapping[word.length] || 0;
         setScore((prevScore) => prevScore + points);
       } else {
-        triggerShake(); // Trigger shake animation on invalid word
+        // Trigger shake animation on invalid word
+        triggerShake(); 
       }
     } else {
-      triggerShake(); // Trigger shake animation for duplicate or invalid length
+      // Trigger shake animation for duplicate or invalid length
+      triggerShake(); 
     }
     setInputLetters(Array(6).fill(""));
     setCurrentIndex(0);
     inputRefs.current[0]?.focus();
   };
 
+  // Triggers a visual shake animation to indicate invalid word submissions.
+  // The animation lasts for 500 milliseconds.
   const triggerShake = () => {
     setShake(true);
     setTimeout(() => {
@@ -132,7 +140,9 @@ const Singleplayer: React.FC = () => {
     }, 500); 
   };
 
-  // Handle backspace and enter key press (removes the previous letter on backspace, submits the word on enter)
+  // Handles keyboard input for backspace and enter keys:
+  // - Backspace clears the current letter and focuses on the previous input box.
+  // - Enter submits the formed word for validation.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace" && !isGameOver) {
       const updatedLetters = [...inputLetters];
@@ -148,7 +158,7 @@ const Singleplayer: React.FC = () => {
     }
   };
 
-  // Play sound on game over
+  // Plays sound when the game ends based on the player's score.
   useEffect(() => {
     if(isGameOver) {
         if(score < 1000) {
@@ -159,7 +169,8 @@ const Singleplayer: React.FC = () => {
     }
   }, [isGameOver, score]);
 
-  // Handle input change and move to next input field
+  // Updates the input letters as the player types.
+  // Moves the cursor to the next input box after a valid letter is entered.
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (!isGameOver) {
       const value = e.target.value.toLowerCase();
@@ -188,7 +199,7 @@ const Singleplayer: React.FC = () => {
       </h1>
       <div className="timer">Time Left: {timeLeft}s</div>
       <div className={`game-content ${shake ? "shake" : ""}`}>
-        <h2 className="game-word">{scrambledWord}</h2>
+        <h2 className="game-word">{scrambledWord.split("").join(" ")}</h2>
         <div className="input-boxes">
           {inputLetters.map((letter, index) => (
             <input
@@ -202,7 +213,7 @@ const Singleplayer: React.FC = () => {
               onChange={(e) => handleInputChange(e, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               disabled={isGameOver}
-              className={`game-input ${shake ? "shake" : ""}`} // Add the shake class here
+              className={`game-input ${shake ? "shake" : ""}`} 
               autoFocus={index === currentIndex}
             />
           ))}
