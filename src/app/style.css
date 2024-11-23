@@ -45,7 +45,7 @@ body {
   font-weight: bold;
   font-size: 24px;
   cursor: pointer;
-  margin: 20px 10px;
+  margin: 10px 10px;
   border-radius: 5px;
   transition: background-color 0.3s;
 }
@@ -154,8 +154,9 @@ body {
   border-radius: 12px;
   padding: 10px 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 40px auto;
+  margin: 40px auto 20px auto;
   width: 420px;
+  font-size: 18px;
 }
 
 .stats-icon {
