@@ -186,6 +186,7 @@ const Singleplayer: React.FC = () => {
       <h1 className="game-title">
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
+      <div className="timer">Time Left: {timeLeft}s</div>
       <div className={`game-content ${shake ? "shake" : ""}`}>
         <h2 className="game-word">{scrambledWord}</h2>
         <div className="input-boxes">
@@ -216,7 +217,6 @@ const Singleplayer: React.FC = () => {
             <div className="stats-score">SCORE: {formattedScore}</div>
           </div>
         </div>
-      <div className="timer">Time Left: {timeLeft}s</div>
       {isGameOver && (
         <div className="game-over">
           Game Over!

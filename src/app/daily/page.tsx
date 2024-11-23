@@ -133,9 +133,9 @@ const GamePage: React.FC = () => {
       ))}
 
       </div>
-      <div className="game-footer">
+      <div className="game-container">
         {isWordValid !== null && (
-          <div className="game-over-div">
+          <div className="game-over">
             {isWordValid
               ? `The word is valid! Succeeded in ${attempts} attempt(s)!`
               : "Try Again!"}
