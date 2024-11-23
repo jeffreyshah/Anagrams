@@ -34,6 +34,14 @@ const Singleplayer: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const playAudio = (audioId: string) => {
+    const audioElement = document.getElementById(audioId) as HTMLAudioElement;
+    if (audioElement) {
+      audioElement.currentTime = 0;
+      audioElement.play().catch((error) => console.error("Error playing audio:", error));
+    }
+  };
+
   // Resets game to initial state (triggered on on play again)
   const resetGame = async () => {
     setInputLetters(Array(6).fill(""));
@@ -101,9 +109,8 @@ const Singleplayer: React.FC = () => {
       const isValid = await checkAnyWord(word, scrambledWord);
       if (isValid) {
 
-        const audioFile = word.length === 6 ? "/sounds/reward.mp3" : "/sounds/newArtifact.mp3";
-        const audio = new Audio(audioFile);
-        audio.play().catch((error) => console.error("Error playing sound:", error));
+        const audioId = word.length === 6 ? "reward-sound" : "artifact-sound";
+        playAudio(audioId);
 
         setValidWords(new Set(validWords.add(word)));
         const scoreMapping: Record<number, number> = {
@@ -150,12 +157,10 @@ const Singleplayer: React.FC = () => {
 
   // Play sound on game over
   useEffect(() => {
-    if(isGameOver) {
-        if(score < 1000) {
-            const audio= new Audio("/sounds/hellnaw.mp3");
-            audio.play().catch((error) => console.error("Error playing audio:", error));
-        }
-      
+    if (isGameOver) {
+      if (score < 1000) {
+        playAudio("game-over-sound");
+      }
     }
   }, [isGameOver, score]);
 
@@ -180,6 +185,11 @@ const Singleplayer: React.FC = () => {
 
   return (
     <div className="game-container">
+      <div className="audio-container">
+        <audio id="reward-sound" src="/sounds/reward.mp3"></audio>
+        <audio id="artifact-sound" src="/sounds/newArtifact.mp3"></audio>
+        <audio id="game-over-sound" src="/sounds/hellnaw.mp3"></audio>
+      </div>
       <button className="home-button" onClick={() => window.location.href = '/'}> 
         <i className="fas fa-home"></i> 
       </button>
