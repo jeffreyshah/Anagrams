@@ -6,19 +6,15 @@ import "../style.css";
 import Image from "next/image";
 
 /**
-
-Game Page (Daily Challenge)
-
-This component handles the game logic for the daily challenge.
-The player...
-    receives a scrambled word.
-    attempts to unscramble it by typing letters in order.
-    submits the word by pressing Enter.
-    earns completion after submitting a valid word.
-Players can try again if the word is invalid.
-
-**/
-
+ * GamePage Component
+ *
+ * Main component for the daily scrambled word challenge.
+ * This component handles:
+ * - Fetching the daily scrambled word from the server.
+ * - Managing user input and game state.
+ * - Validating the player's submitted word.
+ * - Displaying game results and retry options.
+ */
 const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -30,7 +26,12 @@ const GamePage: React.FC = () => {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Fetch the daily scrambled word on mount
+  /**
+   * Fetch the daily scrambled word from the server.
+   * - Sets the scrambled word.
+   * - Initializes the letter input boxes.
+   * - Prepares input refs for focusing.
+   */
   useEffect(() => {
     const fetchWord = async () => {
       try {
@@ -45,27 +46,31 @@ const GamePage: React.FC = () => {
     fetchWord();
   }, []);
 
-  // Reset focus to the first input when the word changes
+  /**
+   * Ensures the first input field is focused when the scrambled word changes.
+   * This is triggered when a new word is fetched.
+   */
   useEffect(() => {
     if (scrambledWord.length > 0) {
       inputRefs.current[0]?.focus();
     }
   }, [scrambledWord]);
 
+  /**
+   * Triggers a shake animation for invalid submissions.
+   * - Sets `shake` to true, initiating the CSS shake effect.
+   * - Resets `shake` to false after a short delay.
+   */
   const triggerShake = () => {
     setShake(true);
-    setTimeout(() => setShake(false), 500); // Shake duration
+    setTimeout(() => setShake(false), 500); 
   };
 
-  const resetGame = () => {
-    setLetters(Array(scrambledWord.length).fill(""));
-    setCurrentIndex(0);
-    setIsWordValid(null);
-    setAttempts(1);
-    setIsGameOver(false);
-    inputRefs.current[0]?.focus();
-  };
-
+  /**
+   * Handles character input in the letter boxes.
+   * - Updates the current letter at the given index.
+   * - Automatically moves focus to the next input box if valid input is entered.
+   */
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     index: number
@@ -85,6 +90,11 @@ const GamePage: React.FC = () => {
     }
   };
 
+  /**
+   * Handles keyboard events in the letter boxes.
+   * - Backspace: Deletes the current letter and moves focus backward.
+   * - Enter: Submits the current word for validation.
+   */
   const handleKeyDown = async (
     e: React.KeyboardEvent<HTMLInputElement>,
     index: number
@@ -109,8 +119,8 @@ const GamePage: React.FC = () => {
         setIsGameOver(true);
       } else {
         triggerShake();
-        if (formedWord.length == 7) {
-          setAttempts((prev) => prev + 1);          
+        if (formedWord.length === scrambledWord.length) {
+          setAttempts((prev) => prev + 1);
         }
         setLetters(Array(scrambledWord.length).fill(""));
         inputRefs.current[0]?.focus();
