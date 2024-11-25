@@ -71,7 +71,7 @@ const getESTDate = (): string => {
 };
 
 // Fetch the daily word from the server based on the current date
-export const getDailyWord = async (): Promise<string> => {
+export const getScrambledDailyWord = async (): Promise<string> => {
     const dateString = getESTDate(); // Get the current date in EST
     const word = typedDailyWords[dateString];
 
@@ -81,6 +81,18 @@ export const getDailyWord = async (): Promise<string> => {
 
     console.log(`Fetched word for ${dateString}: ${word.unscrambled}`);
     return word.scrambled;
+};
+
+export const getUnscrambledDailyWord = async (): Promise<string> => {
+    const dateString = getESTDate(); // Get the current date in EST
+    const word = typedDailyWords[dateString];
+
+    if (!word) {
+        throw new Error(`No word found for date: ${dateString}`);
+    }
+
+    console.log(`Fetched word for ${dateString}: ${word.unscrambled}`);
+    return word.unscrambled;
 };
 
 // Scramble a word by shuffling its letters
