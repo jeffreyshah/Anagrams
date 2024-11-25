@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { getDailyWord, checkWord } from "../server/game";
+import { getScrambledDailyWord, getUnscrambledDailyWord, checkWord } from "../server/game";
 import "../style.css";
 
 /**
@@ -18,6 +18,7 @@ const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [scrambledWord, setScrambledWord] = useState<string>("");
+  const [answer, setAnswer] = useState<string>("");
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<number>(1);
   const [shake, setShake] = useState<boolean>(false);
@@ -34,8 +35,10 @@ const GamePage: React.FC = () => {
   useEffect(() => {
     const fetchWord = async () => {
       try {
-        const fetchedWord = await getDailyWord();
+        const fetchedWord = await getScrambledDailyWord();
+        const fetchedAnswer = await getUnscrambledDailyWord();
         setScrambledWord(fetchedWord);
+        setAnswer(fetchedAnswer);
         setLetters(Array(fetchedWord.length).fill(""));
         inputRefs.current = Array(fetchedWord.length).fill(null);
       } catch (error) {
@@ -111,7 +114,8 @@ const GamePage: React.FC = () => {
       setLetters(updatedLetters);
     } else if (e.key === "Enter") {
       const formedWord = letters.join("");
-      const isValid = await checkWord(formedWord, scrambledWord);
+      let isValid = await checkWord(formedWord, scrambledWord);
+      isValid = formedWord == answer;
       setIsWordValid(isValid);
 
       if (isValid) {
