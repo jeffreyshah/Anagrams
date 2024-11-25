@@ -218,3 +218,79 @@ body {
     transform: translateX(0);
   }
 }
+
+/* Blur the background when instructions are shown */
+.blur-background {
+  filter: blur(5px);
+  transition: filter 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Modal overlay to center and focus the modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal content box styling */
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1001;
+}
+
+.modal-content h2 {
+  text-decoration: underline;
+  margin-bottom: 16px;
+}
+
+.modal-content p {
+  margin-bottom: 16px;
+}
+
+/* Close button styling */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.close-button:hover {
+  color: #555;
+}
+
+/* Question mark button styling */
+.info-button {
+  position: fixed;
+  top: 15px; 
+  right: 20px; 
+  background: #e5e1d4;
+  border: none;
+  font-size: 38px;
+  cursor: pointer;
+  margin-left: 10px;
+  color: #333;
+}
+
+.info-button:hover {
+  color: #555;
+}
+
