@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { getDailyWord, checkWord } from "../server/game";
 import "../style.css";
-import Image from "next/image";
 
 /**
  * GamePage Component
