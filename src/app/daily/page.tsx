@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { getScrambledDailyWord, getUnscrambledDailyWord, checkWord } from "../server/game";
+import { getScrambledDailyWord, getUnscrambledDailyWord, checkAnyWord } from "../server/game";
 import "../style.css";
+
+const sounds = {
+  brick: new Audio("/sounds/brick-on-metal.mp3"),
+  nuhuh: new Audio("/sounds/wrong.mp3")
+};
 
 /**
  * GamePage Component
@@ -20,11 +25,21 @@ const GamePage: React.FC = () => {
   const [scrambledWord, setScrambledWord] = useState<string>("");
   const [answer, setAnswer] = useState<string>("");
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
-  const [attempts, setAttempts] = useState<number>(1);
+  const [attempts, setAttempts] = useState<number>(0);
   const [shake, setShake] = useState<boolean>(false);
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    document.title = "jeffreypoopymonster"; // set the title dynamically
+  }, []);
+
+  useEffect(() => {
+    Object.values(sounds).forEach((audio) => {
+      audio.load(); // Ensure audio files are preloaded
+    });
+  }, []);
 
   /**
    * Fetch the daily scrambled word from the server.
@@ -114,16 +129,23 @@ const GamePage: React.FC = () => {
       setLetters(updatedLetters);
     } else if (e.key === "Enter") {
       const formedWord = letters.join("");
-      let isValid = await checkWord(formedWord, scrambledWord);
-      isValid = formedWord == answer;
+      const isValid = formedWord.length === scrambledWord.length && 
+                    (await checkAnyWord(formedWord, scrambledWord) || formedWord == answer);
       setIsWordValid(isValid);
 
       if (isValid) {
+        setAttempts((prev) => prev + 1);
         setIsGameOver(true);
       } else {
         triggerShake();
         if (formedWord.length === scrambledWord.length) {
           setAttempts((prev) => prev + 1);
+          sounds.brick.currentTime = 0; 
+          sounds.brick.play().catch((error) => console.error("Error playing audio:", error));
+        }
+        else {
+          sounds.nuhuh.currentTime = 0; 
+          sounds.nuhuh.play().catch((error) => console.error("Error playing audio:", error));
         }
         setLetters(Array(scrambledWord.length).fill(""));
         inputRefs.current[0]?.focus();

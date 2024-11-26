@@ -7,9 +7,7 @@ type DailyWordEntry = {
 
 const typedDailyWords: Record<string, DailyWordEntry> = dailyWords as Record<string, DailyWordEntry>;
 
-
 export const checkAnyWord = async (inputWord: string, scrambledWord: string): Promise<boolean> => {
-
     // check if the inputWord is a valid subset of scrambledWord
     const isSubset = (input: string, scrambled: string): boolean => {
         const scrambledCount: Record<string, number> = {};
@@ -31,9 +29,15 @@ export const checkAnyWord = async (inputWord: string, scrambledWord: string): Pr
 
     try {
         const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${inputWord}`);
-        return response.status === 200;
-    } catch {
-        return false; 
+        if (response.ok) {
+            return true;
+        }
+        if (response.status == 404) {
+            return false;
+        }
+        throw new Error(`Unexpected error: ${response.status}`);
+    } catch (error) {
+        return false;
     }
 };
 
