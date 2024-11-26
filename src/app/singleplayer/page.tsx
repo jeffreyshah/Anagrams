@@ -6,7 +6,7 @@ import "../style.css";
 
 /**
 
-The Single PLayer game page
+The Single Player game page
 
 This page contains the logic for the single player game mode. 
 The player...
@@ -30,12 +30,7 @@ if (typeof window !== "undefined") {
 }
 
 const profilePics = [
-  "/images/fortnite.jpeg",
-  "/images/lebron.webp",
-  "/images/jordan.png",
-  "/images/hippo.jpg",
-  "/images/joe.jpg",
-  "/images/vish.avif",
+  "/images/duck.jpg"
 ];
 
 const Singleplayer: React.FC = () => {
@@ -54,7 +49,7 @@ const Singleplayer: React.FC = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    document.title = "jeffreyglizzymonster"; // set the title dynamically
+    document.title = "SinglePlayer";
   }, []);
 
   // Resets the game state to allow the player to start a new round
@@ -95,7 +90,7 @@ const Singleplayer: React.FC = () => {
   // Loads in all our audio files and picks image icon
   useEffect(() => {
     Object.values(sounds).forEach((audio) => {
-      audio.load(); // Ensure audio files are preloaded
+      audio.load(); 
     });
 
     const randomIndex = Math.floor(Math.random() * profilePics.length);

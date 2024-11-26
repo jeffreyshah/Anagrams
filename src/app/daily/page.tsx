@@ -37,12 +37,12 @@ const GamePage: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    document.title = "jeffreypoopymonster"; // set the title dynamically
+    document.title = "DailyChallenge"; 
   }, []);
 
   useEffect(() => {
     Object.values(sounds).forEach((audio) => {
-      audio.load(); // Ensure audio files are preloaded
+      audio.load(); 
     });
   }, []);
 
