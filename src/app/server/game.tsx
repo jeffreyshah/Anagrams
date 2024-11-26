@@ -36,10 +36,13 @@ export const checkAnyWord = async (inputWord: string, scrambledWord: string): Pr
             return false;
         }
         throw new Error(`Unexpected error: ${response.status}`);
-    } catch (error) {
+    } 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    catch (error) {
         return false;
     }
 };
+
 
 // Check if two words are anagrams of each other using the dictionary API
 export const checkWord = async (word1: string, word2: string): Promise<boolean | null> => {
