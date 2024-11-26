@@ -4,20 +4,35 @@ import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import './style.css';
 
+/**
+
+The Home page
+
+This page serves as the main entry point for the SCRAMBLED game. It includes:
+- Navigation to different game modes: Singleplayer and Daily Challenge.
+- A "How to Play" modal with game instructions.
+- A toggle button for background music.
+- Dynamic document title setting.
+
+**/
+
 export default function Home() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false); // State to track if the background music is playing
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // Set the title dynamically
   useEffect(() => {
-    document.title = "SCRAMBLED."; // set the title dynamically
+    document.title = "SCRAMBLED."; 
   }, []);
 
   const [showInstructions, setShowInstructions] = useState(false);
 
+  // Toggles the visibility of the "How to Play" instructions modal
   const toggleInstructions = () => {
     setShowInstructions(!showInstructions);
   };
 
+  // Toggles the background music playback.
   const toggleMusic = () => {
     if (audioRef.current) {
       if (isPlaying) {

@@ -19,6 +19,7 @@ The player can play again after the game ends.
 
 **/
 
+// Preloads sound files for use in the game
 let sounds: { reward: HTMLAudioElement; newArtifact: HTMLAudioElement; hellnaw: HTMLAudioElement };
 if (typeof window !== "undefined") {
   // Ensure Audio is only initialized on the client
@@ -29,6 +30,7 @@ if (typeof window !== "undefined") {
   };
 }
 
+// Preloads image files for use in the game 
 const profilePics = [
   "/images/duck.jpg"
 ];
@@ -42,12 +44,13 @@ const Singleplayer: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState<number>(ROUND_TIME_LIMIT);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [scrambledWord, setScrambledWord] = useState<string>("");
-  const [shake, setShake] = useState<boolean>(false); 
+  const [shake, setShake] = useState<boolean>(false); // State that tracks whether a "shake" animation is active for UX
   const [selectedProfilePic, setSelectedProfilePic] = useState<string>("");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Set tab title dynamically
   useEffect(() => {
     document.title = "SinglePlayer";
   }, []);
@@ -62,7 +65,7 @@ const Singleplayer: React.FC = () => {
     setTimeLeft(ROUND_TIME_LIMIT);
     setIsGameOver(false);
 
-    try {
+    try { // Fetches word from database
       const fetchedWord = await getSingleplayerWord();
       setScrambledWord(fetchedWord);
     } catch (error) {
@@ -83,18 +86,19 @@ const Singleplayer: React.FC = () => {
     }, 1000);
 
     setTimeout(() => {
-      inputRefs.current[0]?.focus();
+      inputRefs.current[0]?.focus(); // Autofocuses cursor on first textbox
     }, 0);
   };
 
-  // Loads in all our audio files and picks image icon
+  // Loads in all our audio files
+  // Randonmly selects and sets image icon
   useEffect(() => {
     Object.values(sounds).forEach((audio) => {
       audio.load(); 
     });
 
     const randomIndex = Math.floor(Math.random() * profilePics.length);
-    setSelectedProfilePic(profilePics[randomIndex]); // randomly selects image icon
+    setSelectedProfilePic(profilePics[randomIndex]); // Randomly selects image icon
 
   }, []);
 
@@ -218,6 +222,7 @@ const Singleplayer: React.FC = () => {
     }
   };
 
+  // Formats the score, padding with leading zeros if necessary
   const formattedScore = score.toString().padStart(4, "0");
 
   return (
