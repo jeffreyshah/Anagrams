@@ -19,6 +19,12 @@ The player can play again after the game ends.
 
 **/
 
+const sounds = {
+  reward: new Audio("/sounds/reward.mp3"),
+  newArtifact: new Audio("/sounds/newArtifact.mp3"),
+  hellnaw: new Audio("/sounds/hellnaw.mp3"),
+};
+
 const Singleplayer: React.FC = () => {
   const ROUND_TIME_LIMIT = 60;
   const [inputLetters, setInputLetters] = useState<string[]>(Array(6).fill(""));
@@ -32,6 +38,10 @@ const Singleplayer: React.FC = () => {
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    document.title = "jeffreyglizzymonster"; // set the title dynamically
+  }, []);
 
   // Resets the game state to allow the player to start a new round
   // Fetches a new scrambled word, resets score and input fields, and restarts the timer.
@@ -67,6 +77,13 @@ const Singleplayer: React.FC = () => {
       inputRefs.current[0]?.focus();
     }, 0);
   };
+
+  // Loads in all our audio files
+  useEffect(() => {
+    Object.values(sounds).forEach((audio) => {
+      audio.load(); // Ensure audio files are preloaded
+    });
+  }, []);
 
   // Fetches the scrambled word from the server and starts the countdown timer.
   // Initializes the game state when the component mounts.
@@ -104,9 +121,8 @@ const Singleplayer: React.FC = () => {
     if (word.length >= 3 && word.length <= 6 && !validWords.has(word)) {
       const isValid = await checkAnyWord(word, scrambledWord);
       if (isValid) {
-
-        const audioFile = word.length === 6 ? "/sounds/reward.mp3" : "/sounds/newArtifact.mp3";
-        const audio = new Audio(audioFile);
+        const audio = word.length === 6 ? sounds.reward : sounds.newArtifact;
+        audio.currentTime = 0; // Reset playback in case it's mid-play
         audio.play().catch((error) => console.error("Error playing sound:", error));
 
         setValidWords(new Set(validWords.add(word)));
@@ -162,8 +178,10 @@ const Singleplayer: React.FC = () => {
   useEffect(() => {
     if(isGameOver) {
         if(score < 1000) {
-            const audio= new Audio("/sounds/hellnaw.mp3");
-            audio.play().catch((error) => console.error("Error playing audio:", error));
+          sounds.hellnaw.currentTime = 0; // Reset before playing
+          sounds.hellnaw.play().catch((error) =>
+            console.error("Error playing audio:", error)
+          );
         }
       
     }

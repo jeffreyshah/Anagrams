@@ -1,10 +1,14 @@
 "use client";
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './style.css';
 
 export default function Home() {
+  useEffect(() => {
+    document.title = "SCRAMBLED"; // set the title dynamically
+  }, []);
+
   const [showInstructions, setShowInstructions] = useState(false);
 
   const toggleInstructions = () => {
