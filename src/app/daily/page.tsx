@@ -4,10 +4,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { getScrambledDailyWord, getUnscrambledDailyWord, checkAnyWord } from "../server/game";
 import "../style.css";
 
-const sounds = {
-  brick: new Audio("/sounds/brick-on-metal.mp3"),
-  nuhuh: new Audio("/sounds/wrong.mp3")
-};
+
+let sounds: { brick: HTMLAudioElement; nuhuh: HTMLAudioElement };
+if (typeof window !== "undefined") {
+  // Ensure Audio is only initialized on the client
+  sounds = {
+    brick: new Audio("/sounds/brick-on-metal.mp3"),
+    nuhuh: new Audio("/sounds/wrong.mp3")
+  };
+}
 
 /**
  * GamePage Component

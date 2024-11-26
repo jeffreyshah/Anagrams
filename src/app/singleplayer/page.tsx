@@ -19,11 +19,15 @@ The player can play again after the game ends.
 
 **/
 
-const sounds = {
-  reward: new Audio("/sounds/reward.mp3"),
-  newArtifact: new Audio("/sounds/newArtifact.mp3"),
-  hellnaw: new Audio("/sounds/hellnaw.mp3"),
-};
+let sounds: { reward: HTMLAudioElement; newArtifact: HTMLAudioElement; hellnaw: HTMLAudioElement };
+if (typeof window !== "undefined") {
+  // Ensure Audio is only initialized on the client
+  sounds = {
+    reward: new Audio("/sounds/reward.mp3"),
+    newArtifact: new Audio("/sounds/newArtifact.mp3"),
+    hellnaw: new Audio("/sounds/hellnaw.mp3"),
+  };
+}
 
 const profilePics = [
   "/images/fortnite.jpeg",
