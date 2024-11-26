@@ -1,18 +1,32 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './style.css';
 
 export default function Home() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
   useEffect(() => {
-    document.title = "SCRAMBLED"; // set the title dynamically
+    document.title = "SCRAMBLED."; // set the title dynamically
   }, []);
 
   const [showInstructions, setShowInstructions] = useState(false);
 
   const toggleInstructions = () => {
     setShowInstructions(!showInstructions);
+  };
+
+  const toggleMusic = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
   };
 
   return (
@@ -30,8 +44,11 @@ export default function Home() {
         >
           <i className="fas fa-question-circle"></i>
         </button>
+        <button className="music-toggle" onClick={toggleMusic}>
+          <i className={`fas ${isPlaying ? "fa-volume-high" : "fa-volume-off"}`}></i>
+        </button>
+        <audio ref={audioRef} src="/sounds/tikiwho.mp3" loop />
       </h1>
-
       {showInstructions && (
         <div className="modal-overlay">
           <div className="modal-content">

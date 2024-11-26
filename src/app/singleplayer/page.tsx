@@ -25,6 +25,15 @@ const sounds = {
   hellnaw: new Audio("/sounds/hellnaw.mp3"),
 };
 
+const profilePics = [
+  "/images/fortnite.jpeg",
+  "/images/lebron.webp",
+  "/images/jordan.png",
+  "/images/hippo.jpg",
+  "/images/joe.jpg",
+  "/images/vish.avif",
+];
+
 const Singleplayer: React.FC = () => {
   const ROUND_TIME_LIMIT = 60;
   const [inputLetters, setInputLetters] = useState<string[]>(Array(6).fill(""));
@@ -34,7 +43,8 @@ const Singleplayer: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState<number>(ROUND_TIME_LIMIT);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [scrambledWord, setScrambledWord] = useState<string>("");
-  const [shake, setShake] = useState<boolean>(false); // Shake state
+  const [shake, setShake] = useState<boolean>(false); 
+  const [selectedProfilePic, setSelectedProfilePic] = useState<string>("");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -78,11 +88,15 @@ const Singleplayer: React.FC = () => {
     }, 0);
   };
 
-  // Loads in all our audio files
+  // Loads in all our audio files and picks image icon
   useEffect(() => {
     Object.values(sounds).forEach((audio) => {
       audio.load(); // Ensure audio files are preloaded
     });
+
+    const randomIndex = Math.floor(Math.random() * profilePics.length);
+    setSelectedProfilePic(profilePics[randomIndex]); // randomly selects image icon
+
   }, []);
 
   // Fetches the scrambled word from the server and starts the countdown timer.
@@ -239,7 +253,7 @@ const Singleplayer: React.FC = () => {
       </div>
       <div className="stats-container">
           <div className="stats-icon">
-            <img src="/images/lebron.webp" alt="Stats Icon" className="icon-image" />
+            <img src={selectedProfilePic} alt="Stats Icon" className="icon-image" />
           </div>
           <div className="stats-text">
             <div className="stats-words">WORDS: {validWords.size} </div>
