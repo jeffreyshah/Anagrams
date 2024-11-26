@@ -4,7 +4,18 @@ import React, { useState, useEffect, useRef } from "react";
 import { getScrambledDailyWord, getUnscrambledDailyWord, checkAnyWord } from "../server/game";
 import "../style.css";
 
+/**
+ * Daily Challenge Component
+ *
+ * Main component for the daily scrambled word challenge.
+ * This component handles:
+ * - Fetching the daily scrambled word from the server.
+ * - Managing user input and game state.
+ * - Validating the player's submitted word.
+ * - Displaying game results and retry options.
+ */
 
+// Preloads sound files for use in the game
 let sounds: { brick: HTMLAudioElement; nuhuh: HTMLAudioElement };
 if (typeof window !== "undefined") {
   // Ensure Audio is only initialized on the client
@@ -14,16 +25,7 @@ if (typeof window !== "undefined") {
   };
 }
 
-/**
- * GamePage Component
- *
- * Main component for the daily scrambled word challenge.
- * This component handles:
- * - Fetching the daily scrambled word from the server.
- * - Managing user input and game state.
- * - Validating the player's submitted word.
- * - Displaying game results and retry options.
- */
+
 const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
