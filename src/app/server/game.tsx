@@ -22,9 +22,11 @@ type DailyWordEntry = {
 // Typecast the dailyWords data to match the DailyWordEntry structure
 const typedDailyWords: Record<string, DailyWordEntry> = dailyWords as Record<string, DailyWordEntry>;
 
-// Checks if the input word is a valid subset of the scrambled word. This function 
-// ensures that the letters in the input word are available in the scrambled word 
-// with matching frequencies.
+/* 
+ * Checks if the input word is a valid subset of the scrambled word. This function 
+ * ensures that the letters in the input word are available in the scrambled word 
+ * with matching frequencies
+ */
 export const checkAnyWord = async (inputWord: string, scrambledWord: string): Promise<boolean> => {
 
     // Helper function to check if the input is a valid subset of scrambled letters
@@ -62,7 +64,9 @@ export const checkAnyWord = async (inputWord: string, scrambledWord: string): Pr
     }
 };
 
-// Fetch a random scrambled word from the 6-letter singleplayer word database
+/* 
+ * Fetch a random scrambled word from the 6-letter singleplayer word database
+ */
 export const getSingleplayerWord = async (): Promise<string> => {
     const randomIndex = Math.floor(Math.random() * words6.words.length);
     const word = words6.words[randomIndex]
@@ -70,7 +74,9 @@ export const getSingleplayerWord = async (): Promise<string> => {
     return scrambleWord(word);
 };
 
-// Get the current date in EST
+/* 
+ * Get the current date in EST
+ */
 const getESTDate = (): string => {
     const now = new Date();
     const utcDate = new Date(now.toISOString());
@@ -80,7 +86,9 @@ const getESTDate = (): string => {
     return dateString;
 };
 
-// Fetch the daily word in its scrambled state from the dailyWords DB based on the current date
+/* 
+ * Fetch the daily word in its scrambled state from the dailyWords json file based on the current date
+ */
 export const getScrambledDailyWord = async (): Promise<string> => {
     const dateString = getESTDate(); // Get the current date in EST
     const word = typedDailyWords[dateString];
@@ -93,7 +101,9 @@ export const getScrambledDailyWord = async (): Promise<string> => {
     return word.scrambled;
 };
 
-// Fetch the daily word in its unscrambled state from the dailyWords DB based on the current date
+/* 
+ * Fetch the daily word in its unscrambled state from the dailyWords json file based on the current date
+ */
 export const getUnscrambledDailyWord = async (): Promise<string> => {
     const dateString = getESTDate(); // Get the current date in EST
     const word = typedDailyWords[dateString];
@@ -106,7 +116,9 @@ export const getUnscrambledDailyWord = async (): Promise<string> => {
     return word.unscrambled;
 };
 
-// Scramble a word by shuffling its letters
+/* 
+ * Scramble a word by shuffling its letters
+ */
 export const scrambleWord = (word: string): string => {
     return word.split('').sort(() => Math.random() - 0.5).join('');
 }
