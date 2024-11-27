@@ -19,10 +19,13 @@ The player can play again after the game ends.
 
 **/
 
-// Preloads sound files for use in the game
+
+/**
+ * Initializes sound files for use in the game
+ */
 let sounds: { reward: HTMLAudioElement; newArtifact: HTMLAudioElement; hellnaw: HTMLAudioElement };
 if (typeof window !== "undefined") {
-  // Ensure Audio is only initialized on the client
+  // ensure audio is only initialized client-side
   sounds = {
     reward: new Audio("/sounds/reward.mp3"),
     newArtifact: new Audio("/sounds/newArtifact.mp3"),
@@ -30,7 +33,9 @@ if (typeof window !== "undefined") {
   };
 }
 
-// Preloads image files for use in the game 
+/** 
+ * Load list of images 
+ */
 const profilePics = [
   "/images/duck.jpg"
 ];
@@ -50,13 +55,15 @@ const Singleplayer: React.FC = () => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Set tab title dynamically
+  // Set tab title 
   useEffect(() => {
     document.title = "SinglePlayer";
   }, []);
 
-  // Resets the game state to allow the player to start a new round
-  // Fetches a new scrambled word, resets score and input fields, and restarts the timer.
+  /**
+   * Resets the game state to start a new round
+   * - Fetches a new word, resets score, timer, and input fields
+   */
   const resetGame = async () => {
     setInputLetters(Array(6).fill(""));
     setCurrentIndex(0);
@@ -65,7 +72,7 @@ const Singleplayer: React.FC = () => {
     setTimeLeft(ROUND_TIME_LIMIT);
     setIsGameOver(false);
 
-    try { // Fetches word from database
+    try { // fetch word from database
       const fetchedWord = await getSingleplayerWord();
       setScrambledWord(fetchedWord);
     } catch (error) {
@@ -76,7 +83,7 @@ const Singleplayer: React.FC = () => {
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         const newTime = Math.max(prevTime - 1, 0);
-        // Out of time
+        // Out of time, end the game
         if (newTime === 0) {
           clearInterval(timerRef.current!);
           setIsGameOver(true);
@@ -86,24 +93,27 @@ const Singleplayer: React.FC = () => {
     }, 1000);
 
     setTimeout(() => {
-      inputRefs.current[0]?.focus(); // Autofocuses cursor on first textbox
+      // Autofocuses cursor on first textbox
+      inputRefs.current[0]?.focus(); 
     }, 0);
   };
 
-  // Loads in all our audio files
-  // Randonmly selects and sets image icon
+  /**
+   * Load audio files and set image icon
+   */
   useEffect(() => {
     Object.values(sounds).forEach((audio) => {
       audio.load(); 
     });
 
     const randomIndex = Math.floor(Math.random() * profilePics.length);
-    setSelectedProfilePic(profilePics[randomIndex]); // Randomly selects image icon
+    setSelectedProfilePic(profilePics[randomIndex]); // randomly select image icon
 
   }, []);
 
-  // Fetches the scrambled word from the server and starts the countdown timer.
-  // Initializes the game state when the component mounts.
+  /**
+   * Fetches the scrambled word from the server and starts the timer.
+   */
   useEffect(() => {
     const fetchWord = async () => {
       try {
@@ -114,7 +124,7 @@ const Singleplayer: React.FC = () => {
       }
     };
     fetchWord();
-
+    // starting timer & countdown logic
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         const newTime = Math.max(prevTime - 1, 0);
@@ -131,17 +141,19 @@ const Singleplayer: React.FC = () => {
     };
   }, []);
 
-  // Validates the submitted word and updates the player's score if valid.
-  // Triggers a shake animation for invalid words or duplicate submissions.
+  /**
+  * Validates the submitted word and updates the player's score if valid.
+  * - Triggers a shake animation for invalid words or duplicate submissions.
+  */
   const handleSubmitWord = async () => {
     const word = inputLetters.join("").trim();
     if (word.length >= 3 && word.length <= 6 && !validWords.has(word)) {
       const isValid = await checkAnyWord(word, scrambledWord);
       if (isValid) {
         const audio = word.length === 6 ? sounds.reward : sounds.newArtifact;
-        audio.currentTime = 0; // Reset playback in case it's mid-play
+        audio.currentTime = 0; // Reset playback
         audio.play().catch((error) => console.error("Error playing sound:", error));
-
+        // Scoring logic for valid words
         setValidWords(new Set(validWords.add(word)));
         const scoreMapping: Record<number, number> = {
           3: 100,
@@ -164,8 +176,9 @@ const Singleplayer: React.FC = () => {
     inputRefs.current[0]?.focus();
   };
 
-  // Triggers a visual shake animation to indicate invalid word submissions.
-  // The animation lasts for 500 milliseconds.
+  /**
+   * Trigger visual shake animation to indicate invalid submission
+   */
   const triggerShake = () => {
     setShake(true);
     setTimeout(() => {
@@ -173,9 +186,10 @@ const Singleplayer: React.FC = () => {
     }, 500); 
   };
 
-  // Handles keyboard input for backspace and enter keys:
-  // - Backspace clears the current letter and focuses on the previous input box.
-  // - Enter submits the formed word for validation.
+  /** Handles keyboard input for backspace and enter keys:
+  * - Backspace clears the current letter and focuses on the previous input box.
+  * - Enter submits the formed word for validation.
+  */ 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if (e.key === "Backspace" && !isGameOver) {
       const updatedLetters = [...inputLetters];
@@ -191,11 +205,13 @@ const Singleplayer: React.FC = () => {
     }
   };
 
-  // Plays sound when the game ends based on the player's score.
+  /** 
+   * Play sound effect based on player's final score 
+   */
   useEffect(() => {
     if(isGameOver) {
         if(score < 1000) {
-          sounds.hellnaw.currentTime = 0; // Reset before playing
+          sounds.hellnaw.currentTime = 0;
           sounds.hellnaw.play().catch((error) =>
             console.error("Error playing audio:", error)
           );
@@ -204,8 +220,9 @@ const Singleplayer: React.FC = () => {
     }
   }, [isGameOver, score]);
 
-  // Updates the input letters as the player types.
-  // Moves the cursor to the next input box after a valid letter is entered.
+  /** Update the player's screen as they enter characters
+   * - Move cursor to the next text box for each valid letter entered.
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (!isGameOver) {
       const value = e.target.value.toLowerCase();
@@ -222,7 +239,9 @@ const Singleplayer: React.FC = () => {
     }
   };
 
-  // Formats the score, padding with leading zeros if necessary
+  /**
+   * Formats the score, padding with leading zeros if necessary
+   */ 
   const formattedScore = score.toString().padStart(4, "0");
 
   return (
