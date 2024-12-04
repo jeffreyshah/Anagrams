@@ -35,6 +35,7 @@ const GamePage: React.FC = () => {
   const [attempts, setAttempts] = useState<number>(0);
   const [shake, setShake] = useState<boolean>(false);
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
+  const [displayMessage, setDisplayMessage] = useState("");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -124,7 +125,7 @@ const GamePage: React.FC = () => {
     index: number
   ) => {
     if (isGameOver) return;
-
+  
     if (e.key === "Backspace") {
       const updatedLetters = [...letters];
       updatedLetters[index] = "";
@@ -136,30 +137,38 @@ const GamePage: React.FC = () => {
       setLetters(updatedLetters);
     } else if (e.key === "Enter") {
       const formedWord = letters.join("");
-      const isValid = formedWord.length === scrambledWord.length && 
-                    (await checkAnyWord(formedWord, scrambledWord) || formedWord == answer);
+      const isValid =
+        formedWord.length === scrambledWord.length &&
+        (await checkAnyWord(formedWord, scrambledWord) || formedWord === answer);
+  
       setIsWordValid(isValid);
-
+  
       if (isValid) {
+        setDisplayMessage("You unscrambled the word!");
         setAttempts((prev) => prev + 1);
         setIsGameOver(true);
+      } else if (formedWord.length < 7) {
+        setDisplayMessage("Enter a 7 letter word!");
+        sounds.nuhuh.currentTime = 0;
+        sounds.nuhuh.play().catch((error) =>
+          console.error("Error playing audio:", error)
+        );
       } else {
+        setDisplayMessage("Try Again!");
         triggerShake();
-        if (formedWord.length === scrambledWord.length) {
-          setAttempts((prev) => prev + 1);
-          sounds.brick.currentTime = 0; 
-          sounds.brick.play().catch((error) => console.error("Error playing audio:", error));
-        }
-        else {
-          sounds.nuhuh.currentTime = 0; 
-          sounds.nuhuh.play().catch((error) => console.error("Error playing audio:", error));
-        }
-        setLetters(Array(scrambledWord.length).fill(""));
-        inputRefs.current[0]?.focus();
+        setAttempts((prev) => prev + 1);
+        sounds.brick.currentTime = 0;
+        sounds.brick.play().catch((error) =>
+          console.error("Error playing audio:", error)
+        );
       }
+  
+      // Reset the letters and focus for the next attempt
+      setLetters(Array(scrambledWord.length).fill(""));
+      inputRefs.current[0]?.focus();
     }
   };
-
+  
   return (
     <div className="game-container">
       <button className="home-button" onClick={() => (window.location.href = "/")}>
@@ -192,11 +201,7 @@ const GamePage: React.FC = () => {
       <div className="stats-container">
         <div className="stats-text">
           <div className="stats-attempts">Attempts: {attempts}</div>
-          {isWordValid !== null && (
-            <div className="game-over-message">
-              {isWordValid ? "You unscrambled the word!" : "Try Again!"}
-            </div>
-          )}
+          {displayMessage}
         </div>
       </div>
       {isGameOver && (
