@@ -43,6 +43,7 @@ Each function should have a docstring comment explaining its purpose and functio
 ```
 
 ### Variable Naming
-Use camelCase for variable names. 
-Correct: variableName
-Incorrect: variable_name
+Use camelCase for variable names.  
+
+**Correct:** `variableName`  
+**Incorrect:** `variable_name`
