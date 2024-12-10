@@ -37,7 +37,7 @@ const GamePage: React.FC = () => {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<number>(0);
   const [shake, setShake] = useState<boolean>(false);
-  const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
+  // const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [displayMessage, setDisplayMessage] = useState("");
 
@@ -150,9 +150,9 @@ const GamePage: React.FC = () => {
         formedWord.length === scrambledWord.length &&
         (await checkAnyWord(formedWord, scrambledWord) || formedWord === answer);
   
-      setIsWordValid(isValid);
+      // setIsWordValid(isValid);
   
-      if (isWordValid) {
+      if (isValid) {
         setDisplayMessage("You unscrambled the word!");
         setAttempts((prev) => prev + 1);
         setIsGameOver(true);
