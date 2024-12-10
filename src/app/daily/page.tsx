@@ -38,7 +38,7 @@ const GamePage: React.FC = () => {
   const [attempts, setAttempts] = useState<number>(0);
   const [shake, setShake] = useState<boolean>(false);
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
-  const [showConfetti, setShowConfetti] = useState<boolean>(false); // State for confetti
+  const [showConfetti, setShowConfetti] = useState<boolean>(false);
   const [displayMessage, setDisplayMessage] = useState("");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -152,13 +152,13 @@ const GamePage: React.FC = () => {
   
       setIsWordValid(isValid);
   
-      if (isValid) {
+      if (isWordValid) {
         setDisplayMessage("You unscrambled the word!");
         setAttempts((prev) => prev + 1);
         setIsGameOver(true);
         sounds.dailyplay.pause();
-        setShowConfetti(true); // Trigger confetti on correct guess
-        setTimeout(() => setShowConfetti(false), 26000); // Stop confetti after 3 seconds
+        setShowConfetti(true); 
+        setTimeout(() => setShowConfetti(false), 26000);
         sounds.duhduh.play().catch((error) => console.error("Error playing audio:", error));
       } else if (formedWord.length < 7) {
         setDisplayMessage("Enter a 7 letter word!");
