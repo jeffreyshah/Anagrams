@@ -62,7 +62,7 @@ export default function Home() {
         <button className="music-toggle" onClick={toggleMusic}>
           <i className={`fas ${isPlaying ? "fa-volume-high" : "fa-volume-off"}`}></i>
         </button>
-        <audio ref={audioRef} src="/sounds/tikiwho.mp3" loop />
+        <audio ref={audioRef} src="/sounds/bounce.mp3" loop />
       </h1>
       {showInstructions && (
         <div className="modal-overlay">

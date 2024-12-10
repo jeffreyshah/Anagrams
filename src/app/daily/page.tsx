@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { getScrambledDailyWord, getUnscrambledDailyWord, checkAnyWord } from "../server/game";
+import Confetti from "react-confetti";
 import "../style.css";
 
 /**
@@ -16,15 +17,17 @@ import "../style.css";
  */
 
 // Preloads sound files for use in the game
-let sounds: { brick: HTMLAudioElement; nuhuh: HTMLAudioElement };
+let sounds: { brick: HTMLAudioElement; nuhuh: HTMLAudioElement; duhduh: HTMLAudioElement;
+              dailyplay: HTMLAudioElement };
 if (typeof window !== "undefined") {
   // Ensure Audio is only initialized on the client
   sounds = {
-    brick: new Audio("/sounds/brick-on-metal.mp3"),
-    nuhuh: new Audio("/sounds/wrong.mp3")
+    brick: new Audio("/sounds/boom.mp3"),
+    nuhuh: new Audio("/sounds/wrong.mp3"),
+    duhduh: new Audio("/sounds/pony.mp3"),
+    dailyplay: new Audio("/sounds/dailyplay.mp3")
   };
 }
-
 
 const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
@@ -35,11 +38,12 @@ const GamePage: React.FC = () => {
   const [attempts, setAttempts] = useState<number>(0);
   const [shake, setShake] = useState<boolean>(false);
   const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false); // State for confetti
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
-    document.title = "DailyChallenge"; 
+    document.title = "Daily Challenge \u2014 SCRAMBLED"; 
   }, []);
 
   useEffect(() => {
@@ -68,6 +72,11 @@ const GamePage: React.FC = () => {
       }
     };
     fetchWord();
+
+    sounds.dailyplay.currentTime = 0; 
+    sounds.dailyplay.play().catch((error) =>
+      console.error("Error playing gameplay audio:", error)
+    );
   }, []);
 
   /**
@@ -143,6 +152,10 @@ const GamePage: React.FC = () => {
       if (isValid) {
         setAttempts((prev) => prev + 1);
         setIsGameOver(true);
+        sounds.dailyplay.pause();
+        setShowConfetti(true); // Trigger confetti on correct guess
+        setTimeout(() => setShowConfetti(false), 26000); // Stop confetti after 3 seconds
+        sounds.duhduh.play().catch((error) => console.error("Error playing audio:", error));
       } else {
         triggerShake();
         if (formedWord.length === scrambledWord.length) {
@@ -151,6 +164,7 @@ const GamePage: React.FC = () => {
           sounds.brick.play().catch((error) => console.error("Error playing audio:", error));
         }
         else {
+          sounds.nuhuh.volume = 0.5;
           sounds.nuhuh.currentTime = 0; 
           sounds.nuhuh.play().catch((error) => console.error("Error playing audio:", error));
         }
@@ -162,6 +176,7 @@ const GamePage: React.FC = () => {
 
   return (
     <div className="game-container">
+      {showConfetti && <Confetti />} {/* Render confetti when `showConfetti` is true */}
       <button className="home-button" onClick={() => (window.location.href = "/")}>
         <i className="fas fa-home"></i>
       </button>
