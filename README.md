@@ -15,3 +15,35 @@ Scrambled is a web-based anagram game where players rearrange characters in a ra
 ## Project Structure
 - **Singleplayer Mode Logic**: Found in `src/app/singleplayer`
 - **Daily Challenge Logic**: Found in `src/app/daily`
+
+## Contributing
+
+To ensure consistency and maintainability, please adhere to the following guidelines when contributing to this project:
+
+### Component Documentation
+All new components must include a docstring comment in the following format:
+
+```javascript
+/**
+ * New Component
+ *
+ * This component is responsible for [...]. It includes:
+ *   - Functionality A
+ *   - Functionality B
+ *   ...
+ *   - Functionality N
+ */
+ ```
+### Function Documentation
+Each function should have a docstring comment explaining its purpose and functionality. For example:
+```javascript
+/**
+ * This function takes an integer N and returns a scrambled word of length N.
+ */
+```
+
+### Variable Naming
+Use camelCase for variable names.  
+
+**Correct:** `variableName`  
+**Incorrect:** `variable_name`

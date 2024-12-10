@@ -19,17 +19,16 @@ The player can play again after the game ends.
 
 **/
 
-
-/**
- * Initializes sound files for use in the game
- */
-let sounds: { reward: HTMLAudioElement; newArtifact: HTMLAudioElement; hellnaw: HTMLAudioElement };
+// Preloads sound files for use in the game
+let sounds: { reward: HTMLAudioElement; newArtifact: HTMLAudioElement; 
+              hellnaw: HTMLAudioElement; gameplay: HTMLAudioElement;};
 if (typeof window !== "undefined") {
   // ensure audio is only initialized client-side
   sounds = {
     reward: new Audio("/sounds/reward.mp3"),
     newArtifact: new Audio("/sounds/newArtifact.mp3"),
     hellnaw: new Audio("/sounds/hellnaw.mp3"),
+    gameplay: new Audio("/sounds/gameplay.mp3")
   };
 }
 
@@ -37,7 +36,7 @@ if (typeof window !== "undefined") {
  * Load list of images 
  */
 const profilePics = [
-  "/images/duck.jpg"
+  "/images/lebron.webp"
 ];
 
 const Singleplayer: React.FC = () => {
@@ -57,7 +56,7 @@ const Singleplayer: React.FC = () => {
 
   // Set tab title 
   useEffect(() => {
-    document.title = "SinglePlayer";
+    document.title = "Singleplayer \u2014 SCRAMBLED";
   }, []);
 
   /**
@@ -92,6 +91,12 @@ const Singleplayer: React.FC = () => {
       });
     }, 1000);
 
+    sounds.gameplay.currentTime = 0; 
+    sounds.gameplay.volume = 0.45;
+    sounds.gameplay.play().catch((error) =>
+      console.error("Error playing gameplay audio:", error)
+    );
+
     setTimeout(() => {
       // Autofocuses cursor on first textbox
       inputRefs.current[0]?.focus(); 
@@ -124,7 +129,13 @@ const Singleplayer: React.FC = () => {
       }
     };
     fetchWord();
-    // starting timer & countdown logic
+
+    sounds.gameplay.currentTime = 0; 
+    sounds.gameplay.volume = 0.45;
+    sounds.gameplay.play().catch((error) =>
+      console.error("Error playing gameplay audio:", error)
+    );
+
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         const newTime = Math.max(prevTime - 1, 0);
@@ -210,6 +221,7 @@ const Singleplayer: React.FC = () => {
    */
   useEffect(() => {
     if(isGameOver) {
+      sounds.gameplay.pause();
         if(score < 1000) {
           sounds.hellnaw.currentTime = 0;
           sounds.hellnaw.play().catch((error) =>
@@ -244,55 +256,86 @@ const Singleplayer: React.FC = () => {
    */ 
   const formattedScore = score.toString().padStart(4, "0");
 
+  const getScoreForWord = (word: string): number => {
+    const scoreMapping: Record<number, number> = {
+      3: 100,
+      4: 400,
+      5: 1200,
+      6: 2000,
+    };
+    return scoreMapping[word.length] || 0;
+  };
+
   return (
-    <div className="game-container">
-      <button className="home-button" onClick={() => window.location.href = '/'}> 
-        <i className="fas fa-home"></i> 
-      </button>
-      <h1 className="game-title">
-        SCRAMB<span className="tilted-letter">L</span>ED
-      </h1>
-      <div className="timer">Time Left: {timeLeft}s</div>
-      <div className={`game-content ${shake ? "shake" : ""}`}>
-        <h2 className="game-word">{scrambledWord.split("").join(" ")}</h2>
-        <div className="input-boxes">
-          {inputLetters.map((letter, index) => (
-            <input
-              key={index}
-              type="text"
-              value={letter}
-              maxLength={1}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
-              onChange={(e) => handleInputChange(e, index)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-              disabled={isGameOver}
-              className={`game-input ${shake ? "shake" : ""}`} 
-              autoFocus={index === currentIndex}
-            />
-          ))}
+      <div className="game-container">
+        <button className="home-button" onClick={() => window.location.href = '/'}>
+          <i className="fas fa-home"></i>
+        </button>
+        <h1 className="page-title">
+          SCRAMB<span className="tilted-letter">L</span>ED
+        </h1>
+        {isGameOver ? (
+      <div className="end-of-round-screen">
+        <div className="end-stats-box">
+          <p className="end-stat-score">Score: <span className="end-stat-value score">{formattedScore}</span></p>
         </div>
+        <div className="word-list-box">
+        <p className="end-stat-words">Words: <span className="end-stat-value">{validWords.size}</span></p>
+          <ul className="word-list">
+          {Array.from(validWords) // Convert the Set to an array
+            .sort((a, b) => b.length - a.length) // Sort by word length
+            .map((word, index) => (
+                <li key={index} className="word-item">
+                  <span className="word-text">{word}</span>
+                  <span className="word-score">{getScoreForWord(word)}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+        <button className="game-button" onClick={resetGame}>
+          Play Again <i className="fa fa-repeat fa-sm" style={{ marginLeft: '4px' }}></i>
+        </button>
       </div>
-      <div className="stats-container">
-          <div className="stats-icon">
-            <img src={selectedProfilePic} alt="Stats Icon" className="icon-image" />
-          </div>
-          <div className="stats-text">
-            <div className="stats-words">WORDS: {validWords.size} </div>
-            <div className="stats-score">SCORE: {formattedScore}</div>
-          </div>
-        </div>
-      {isGameOver && (
-        <div className="game-over">
-          Game Over!
-          <button className="game-button" onClick={resetGame}>
-            Play Again
-          </button>
-        </div>
-      )}
-    </div>
-  );
+        ) : (
+          <>
+            <div className="timer">Time Left: {timeLeft}s</div>
+            {/* <div className="timer">
+              <CircularTimer duration={ROUND_TIME_LIMIT} timeLeft={timeLeft} />
+            </div> */}
+            <div className={`game-content ${shake ? "shake" : ""}`}>
+              <h2 className="game-word">{scrambledWord.split("").join(" ")}</h2>
+              <div className="input-boxes">
+                {inputLetters.map((letter, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    value={letter}
+                    maxLength={1}
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
+                    onChange={(e) => handleInputChange(e, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    disabled={isGameOver}
+                    className={`game-input ${shake ? "shake" : ""}`}
+                    autoFocus={index === currentIndex}
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="stats-container">
+              <div className="stats-icon">
+                <img src={selectedProfilePic} alt="Stats Icon" className="icon-image" />
+              </div>
+              <div className="stats-text">
+                <div className="stats-words">WORDS: {validWords.size} </div>
+                <div className="stats-score">SCORE: {formattedScore}</div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    );
 };
 
 export default Singleplayer;
