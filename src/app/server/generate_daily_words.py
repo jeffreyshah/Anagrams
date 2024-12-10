@@ -2,18 +2,26 @@ import random
 import json
 from datetime import datetime, timedelta
 
+'''
+Return list of words from the file
+'''
 def load_words(file_path):
     with open(file_path, "r") as file:
         return [line.strip() for line in file.readlines()]
 
+'''
+Randomly scramble given word
+'''
 def scramble_word(word):
     word_list = list(word)
     random.shuffle(word_list)
     return ''.join(word_list)
 
+'''
+Generate 365 words and their scrambled form, and save to a json file.
+This ensures that all words are scrambled the same way for all users. 
+'''
 def generate_daily_words(words, start_date, days=365):
-    if len(words) < days:
-        raise ValueError(f"Not enough unique words. Need {days}, but only have {len(words)}.")
 
     random.shuffle(words)
 
@@ -29,10 +37,16 @@ def generate_daily_words(words, start_date, days=365):
 
     return daily_words
 
+'''
+Save words to json
+'''
 def save_daily_words(daily_words, output_file):
     with open(output_file, "w") as file:
         json.dump(daily_words, file, indent=4)
 
+'''
+Driver function for creating daily words
+'''
 def main():
     words_file = 'words-7.txt'  
     output_file = 'dailyWords.json'

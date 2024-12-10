@@ -17,22 +17,26 @@ This page serves as the main entry point for the SCRAMBLED game. It includes:
 **/
 
 export default function Home() {
-  const [isPlaying, setIsPlaying] = useState(false); // State to track if the background music is playing
+  const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Set the title dynamically
+  // Set the title 
   useEffect(() => {
     document.title = "SCRAMBLED."; 
   }, []);
 
   const [showInstructions, setShowInstructions] = useState(false);
 
-  // Toggles the visibility of the "How to Play" instructions modal
+  /** 
+   * Toggle visibility of "How to Play" button 
+   */
   const toggleInstructions = () => {
     setShowInstructions(!showInstructions);
   };
 
-  // Toggles the background music playback.
+  /** 
+   * Toggles the background music playback. 
+   */ 
   const toggleMusic = () => {
     if (audioRef.current) {
       if (isPlaying) {
