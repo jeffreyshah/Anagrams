@@ -36,7 +36,7 @@ if (typeof window !== "undefined") {
  * Load list of images 
  */
 const profilePics = [
-  "/images/lebron.webp"
+  "/images/duck.jpg"
 ];
 
 const Singleplayer: React.FC = () => {
@@ -91,11 +91,11 @@ const Singleplayer: React.FC = () => {
       });
     }, 1000);
 
-    sounds.gameplay.currentTime = 0; 
-    sounds.gameplay.volume = 0.45;
-    sounds.gameplay.play().catch((error) =>
-      console.error("Error playing gameplay audio:", error)
-    );
+    // sounds.gameplay.currentTime = 0; 
+    // sounds.gameplay.volume = 0.45;
+    // sounds.gameplay.play().catch((error) =>
+    //   console.error("Error playing gameplay audio:", error)
+    // );
 
     setTimeout(() => {
       // Autofocuses cursor on first textbox
@@ -130,11 +130,11 @@ const Singleplayer: React.FC = () => {
     };
     fetchWord();
 
-    sounds.gameplay.currentTime = 0; 
-    sounds.gameplay.volume = 0.45;
-    sounds.gameplay.play().catch((error) =>
-      console.error("Error playing gameplay audio:", error)
-    );
+    // sounds.gameplay.currentTime = 0; 
+    // sounds.gameplay.volume = 0.45;
+    // sounds.gameplay.play().catch((error) =>
+    //   console.error("Error playing gameplay audio:", error)
+    // );
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -223,6 +223,7 @@ const Singleplayer: React.FC = () => {
     if(isGameOver) {
       sounds.gameplay.pause();
         if(score < 1000) {
+          sounds.hellnaw.volume = 0.5
           sounds.hellnaw.currentTime = 0;
           sounds.hellnaw.play().catch((error) =>
             console.error("Error playing audio:", error)
