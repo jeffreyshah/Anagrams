@@ -17,6 +17,20 @@ The player...
 The game ends after 60 seconds. 
 The player can play again after the game ends.
 
+MVC Design Pattern:
+Model:
+ - State variables (score, validWords, etc.)
+ - Server-side getter functions (getSingleplayerWord, checkAnyWord)
+
+View:
+ - Render methods
+ - Responsible for UI representation
+ - Uses state to dynamically update UI
+
+Controller: 
+ - Component methods (handleSubmitWord, resetGame, etc.)
+ - Manages user interactions
+ - Updates model (state) based on user actions
 **/
 
 // Preloads sound files for use in the game
