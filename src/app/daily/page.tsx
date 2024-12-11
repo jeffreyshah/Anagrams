@@ -14,7 +14,23 @@ import "../style.css";
  * - Managing user input and game state.
  * - Validating the player's submitted word.
  * - Displaying game results and retry options.
- */
+ * 
+ * MVC Design Pattern:
+ * Model:
+ *  - State variables (score, validWords, etc.)
+ *  - Server-side getter functions (getScrambledDailyWord, checkAnyWord)
+
+ * View:
+ *  - Render methods
+ *  - Responsible for UI representation
+ *  - Uses state to dynamically update UI
+
+ * Controller: 
+ *  - Component methods (handleSubmitWord, resetGame, etc.)
+ *  - Manages user interactions
+ *  - Updates model (State variables) based on user actions
+ * 
+*/
 
 // Preloads sound files for use in the game
 let sounds: { brick: HTMLAudioElement; nuhuh: HTMLAudioElement; duhduh: HTMLAudioElement;
