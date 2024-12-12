@@ -14,6 +14,23 @@ This page serves as the main entry point for the SCRAMBLED game. It includes:
 - A toggle button for background music.
 - Dynamic document title setting.
 
+ Strategy Pattern Overview:
+ - The game modes (Singleplayer and Daily Challenge) represent distinct 
+   strategies for word game gameplay
+ - Each strategy (route) encapsulates a different approach to word 
+   unscrambling and scoring
+ - Strategies are interchangeable at runtime via navigation links
+
+ Strategies:
+ 1. Singleplayer Strategy:
+    - 60-second time limit
+    - Multiple word submissions
+    - Cumulative scoring
+ 
+ 2. Daily Challenge Strategy:
+    - Single word solution
+    - Time lasts 24 hours
+Both of these components are similar in handling user-input and word validation.
 **/
 
 export default function Home() {
@@ -48,6 +65,10 @@ export default function Home() {
     }
   };
 
+  /*
+    Application of Strategy design pattern: use routing as the strategy selection, where the 
+    user defines which component to use.
+  */
   return (
     <div className="container">
       <h1 className="game-title">

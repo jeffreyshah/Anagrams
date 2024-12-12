@@ -6,20 +6,34 @@ import { InputBox, GameStats, Scoreboard, TimerDisplay } from "../components";
 import AudioManager from "../utils/AudioManager";
 import "../style.css";
 
+
 /**
+* The Single Player game page
 
-The Single Player game page
+* This page contains the logic for the single player game mode. 
+* The player...
+*     is given a scrambled word and has to unscramble it by typing the correct word. 
+*     can submit words by typing them in the input boxes and pressing enter.
+*     can also delete the previous letter by pressing backspace. 
+*     earns points for each valid word submitted, the points are based on the length of the word.
+* The game ends after 60 seconds. 
+* The player can play again after the game ends.
 
-This page contains the logic for the single player game mode. 
-The player...
-    is given a scrambled word and has to unscramble it by typing the correct word. 
-    can submit words by typing them in the input boxes and pressing enter.
-    can also delete the previous letter by pressing backspace. 
-    earns points for each valid word submitted, the points are based on the length of the word.
-The game ends after 60 seconds. 
-The player can play again after the game ends.
+* MVC Design Pattern:
+* Model:
+*  - State variables (score, validWords, etc.)
+*  - Server-side getter functions (getSingleplayerWord, checkAnyWord)
 
-**/
+* View:
+*  - Render methods
+*  - Responsible for UI representation
+*  - Uses state to dynamically update UI
+
+* Controller: 
+*  - Component methods (handleSubmitWord, resetGame, etc.)
+*  - Manages user interactions
+*  - Updates model (State variables) based on user actions
+*/
 
 // Defines sound files for use in the game
 const defaultSounds = {
