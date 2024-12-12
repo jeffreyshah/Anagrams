@@ -1,7 +1,9 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import { getSingleplayerWord, checkAnyWord } from "../server/game";
+import { useTimer } from "../hooks/useTimer";
+import { InputBox, GameStats, Scoreboard, TimerDisplay } from "../components";
+import AudioManager from "../utils/AudioManager";
 import "../style.css";
 
 
@@ -33,24 +35,19 @@ import "../style.css";
 *  - Updates model (State variables) based on user actions
 */
 
-// Preloads sound files for use in the game
-let sounds: { reward: HTMLAudioElement; newArtifact: HTMLAudioElement; 
-              hellnaw: HTMLAudioElement; gameplay: HTMLAudioElement;};
-if (typeof window !== "undefined") {
-  // ensure audio is only initialized client-side
-  sounds = {
-    reward: new Audio("/sounds/reward.mp3"),
-    newArtifact: new Audio("/sounds/newArtifact.mp3"),
-    hellnaw: new Audio("/sounds/hellnaw.mp3"),
-    gameplay: new Audio("/sounds/gameplay.mp3")
-  };
-}
+// Defines sound files for use in the game
+const defaultSounds = {
+  reward: "/sounds/reward.mp3",
+  newArtifact: "/sounds/newArtifact.mp3",
+  hellnaw: "/sounds/hellnaw.mp3",
+  gameplay: "/sounds/gameplay.mp3",
+};
 
 /** 
  * Load list of images 
  */
 const profilePics = [
-  "/images/duck.jpg"
+  "/images/me.jpg"
 ];
 
 const Singleplayer: React.FC = () => {
@@ -59,18 +56,36 @@ const Singleplayer: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [validWords, setValidWords] = useState<Set<string>>(new Set());
   const [score, setScore] = useState<number>(0);
-  const [timeLeft, setTimeLeft] = useState<number>(ROUND_TIME_LIMIT);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [scrambledWord, setScrambledWord] = useState<string>("");
   const [shake, setShake] = useState<boolean>(false); // State that tracks whether a "shake" animation is active for UX
   const [selectedProfilePic, setSelectedProfilePic] = useState<string>("");
-
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  /**
+   * Load audio files into AudioManager instance
+   */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const audioManager = new AudioManager();
+  useEffect(() => {
+    audioManager.loadSounds(defaultSounds);
+  }, [audioManager]);
+
+  const onTimeEnd = () => setIsGameOver(true);
+  const { timeLeft, resetTimer } = useTimer(ROUND_TIME_LIMIT, onTimeEnd);
 
   // Set tab title 
   useEffect(() => {
     document.title = "Singleplayer \u2014 SCRAMBLED";
+  }, []);
+
+  /**
+   * Sets randomized image icon
+   */
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * profilePics.length);
+    setSelectedProfilePic(profilePics[randomIndex]); // randomly select image icon
+
   }, []);
 
   /**
@@ -82,89 +97,27 @@ const Singleplayer: React.FC = () => {
     setCurrentIndex(0);
     setValidWords(new Set());
     setScore(0);
-    setTimeLeft(ROUND_TIME_LIMIT);
     setIsGameOver(false);
 
-    try { // fetch word from database
+    try {
       const fetchedWord = await getSingleplayerWord();
       setScrambledWord(fetchedWord);
     } catch (error) {
       console.error("Error fetching word:", error);
     }
 
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        const newTime = Math.max(prevTime - 1, 0);
-        // Out of time, end the game
-        if (newTime === 0) {
-          clearInterval(timerRef.current!);
-          setIsGameOver(true);
-        }
-        return newTime;
-      });
-    }, 1000);
-
-    // sounds.gameplay.currentTime = 0; 
-    // sounds.gameplay.volume = 0.45;
-    // sounds.gameplay.play().catch((error) =>
-    //   console.error("Error playing gameplay audio:", error)
-    // );
-
-    setTimeout(() => {
-      // Autofocuses cursor on first textbox
-      inputRefs.current[0]?.focus(); 
-    }, 0);
+    resetTimer();
+    setTimeout(() => inputRefs.current[0]?.focus(), 0);
   };
-
-  /**
-   * Load audio files and set image icon
-   */
-  useEffect(() => {
-    Object.values(sounds).forEach((audio) => {
-      audio.load(); 
-    });
-
-    const randomIndex = Math.floor(Math.random() * profilePics.length);
-    setSelectedProfilePic(profilePics[randomIndex]); // randomly select image icon
-
-  }, []);
 
   /**
    * Fetches the scrambled word from the server and starts the timer.
    */
   useEffect(() => {
-    const fetchWord = async () => {
-      try {
-        const fetchedWord = await getSingleplayerWord();
-        setScrambledWord(fetchedWord);
-      } catch (error) {
-        console.error("Error fetching word:", error);
-      }
-    };
-    fetchWord();
-
-    // sounds.gameplay.currentTime = 0; 
-    // sounds.gameplay.volume = 0.45;
-    // sounds.gameplay.play().catch((error) =>
-    //   console.error("Error playing gameplay audio:", error)
-    // );
-
-    timerRef.current = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        const newTime = Math.max(prevTime - 1, 0);
-        if (newTime === 0) {
-          clearInterval(timerRef.current!);
-          setIsGameOver(true);
-        }
-        return newTime;
-      });
-    }, 1000);
-
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
+    resetGame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, []); 
+ 
 
   /**
   * Validates the submitted word and updates the player's score if valid.
@@ -175,16 +128,13 @@ const Singleplayer: React.FC = () => {
     if (word.length >= 3 && word.length <= 6 && !validWords.has(word)) {
       const isValid = await checkAnyWord(word, scrambledWord);
       if (isValid) {
-        const audio = word.length === 6 ? sounds.reward : sounds.newArtifact;
-        audio.currentTime = 0; // Reset playback
-        audio.play().catch((error) => console.error("Error playing sound:", error));
+        const audio = word.length === 6 ? "reward" : "newArtifact";
+        audioManager.setCurrentTime(audio, 0);
+        audioManager.playSound(audio);
         // Scoring logic for valid words
         setValidWords(new Set(validWords.add(word)));
         const scoreMapping: Record<number, number> = {
-          3: 100,
-          4: 400,
-          5: 1200,
-          6: 2000,
+          3: 100, 4: 400, 5: 1200, 6: 2000,
         };
         const points = scoreMapping[word.length] || 0;
         setScore((prevScore) => prevScore + points);
@@ -206,9 +156,7 @@ const Singleplayer: React.FC = () => {
    */
   const triggerShake = () => {
     setShake(true);
-    setTimeout(() => {
-      setShake(false); 
-    }, 500); 
+    setTimeout(() => { setShake(false); }, 500); 
   };
 
   /** Handles keyboard input for backspace and enter keys:
@@ -235,17 +183,14 @@ const Singleplayer: React.FC = () => {
    */
   useEffect(() => {
     if(isGameOver) {
-      sounds.gameplay.pause();
         if(score < 1000) {
-          sounds.hellnaw.volume = 0.5
-          sounds.hellnaw.currentTime = 0;
-          sounds.hellnaw.play().catch((error) =>
-            console.error("Error playing audio:", error)
-          );
-        }
-      
+          const audio = "hellnaw";
+          audioManager.setVolume(audio, 0.5);
+          audioManager.setCurrentTime(audio, 0);
+          audioManager.playSound(audio);
+        } 
     }
-  }, [isGameOver, score]);
+  }, [isGameOver, score, audioManager]);
 
   /** Update the player's screen as they enter characters
    * - Move cursor to the next text box for each valid letter entered.
@@ -266,21 +211,6 @@ const Singleplayer: React.FC = () => {
     }
   };
 
-  /**
-   * Formats the score, padding with leading zeros if necessary
-   */ 
-  const formattedScore = score.toString().padStart(4, "0");
-
-  const getScoreForWord = (word: string): number => {
-    const scoreMapping: Record<number, number> = {
-      3: 100,
-      4: 400,
-      5: 1200,
-      6: 2000,
-    };
-    return scoreMapping[word.length] || 0;
-  };
-
   return (
       <div className="game-container">
         <button className="home-button" onClick={() => window.location.href = '/'}>
@@ -290,63 +220,38 @@ const Singleplayer: React.FC = () => {
           SCRAMB<span className="tilted-letter">L</span>ED
         </h1>
         {isGameOver ? (
-      <div className="end-of-round-screen">
-        <div className="end-stats-box">
-          <p className="end-stat-score">Score: <span className="end-stat-value score">{formattedScore}</span></p>
-        </div>
-        <div className="word-list-box">
-        <p className="end-stat-words">Words: <span className="end-stat-value">{validWords.size}</span></p>
-          <ul className="word-list">
-          {Array.from(validWords) // Convert the Set to an array
-            .sort((a, b) => b.length - a.length) // Sort by word length
-            .map((word, index) => (
-                <li key={index} className="word-item">
-                  <span className="word-text">{word}</span>
-                  <span className="word-score">{getScoreForWord(word)}</span>
-                </li>
-              ))}
-          </ul>
-        </div>
-        <button className="game-button" onClick={resetGame}>
-          Play Again <i className="fa fa-repeat fa-sm" style={{ marginLeft: '4px' }}></i>
-        </button>
-      </div>
+          <div className="end-of-round-screen">
+            <GameStats score={score} validWords={validWords} />
+            <button className="game-button" onClick={resetGame}>
+              Play Again <i className="fa fa-repeat fa-sm" style={{ marginLeft: '4px' }}></i>
+            </button>
+          </div>
         ) : (
           <>
-            <div className="timer">Time Left: {timeLeft}s</div>
-            {/* <div className="timer">
-              <CircularTimer duration={ROUND_TIME_LIMIT} timeLeft={timeLeft} />
-            </div> */}
+            <TimerDisplay timeRemaining={timeLeft}/>
             <div className={`game-content ${shake ? "shake" : ""}`}>
               <h2 className="game-word">{scrambledWord.split("").join(" ")}</h2>
               <div className="input-boxes">
                 {inputLetters.map((letter, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    value={letter}
-                    maxLength={1}
-                    ref={(el) => {
-                      inputRefs.current[index] = el;
-                    }}
-                    onChange={(e) => handleInputChange(e, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    disabled={isGameOver}
-                    className={`game-input ${shake ? "shake" : ""}`}
-                    autoFocus={index === currentIndex}
+                  <InputBox
+                  key={index} 
+                  value={letter} 
+                  onChange={(e) => handleInputChange(e, index)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  isDisabled={isGameOver} isFocused={index === currentIndex}
+                  inputRef={(el) => {
+                    inputRefs.current[index] = el;
+                  }}
+                  shake={shake && !isGameOver && letter === ""}
                   />
                 ))}
               </div>
             </div>
-            <div className="stats-container">
-              <div className="stats-icon">
-                <img src={selectedProfilePic} alt="Stats Icon" className="icon-image" />
-              </div>
-              <div className="stats-text">
-                <div className="stats-words">WORDS: {validWords.size} </div>
-                <div className="stats-score">SCORE: {formattedScore}</div>
-              </div>
-            </div>
+            <Scoreboard 
+              profilePic={selectedProfilePic} 
+              validWordsCount={validWords.size} 
+              score={score} 
+            />
           </>
         )}
       </div>

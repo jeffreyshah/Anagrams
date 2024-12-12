@@ -120,5 +120,9 @@ export const getUnscrambledDailyWord = async (): Promise<string> => {
  * Scramble a word by shuffling its letters
  */
 export const scrambleWord = (word: string): string => {
-    return word.split('').sort(() => Math.random() - 0.5).join('');
-}
+    let scrambled = word;
+    while (scrambled === word) {
+        scrambled = word.split('').sort(() => Math.random() - 0.5).join('');
+    }
+    return scrambled;
+};

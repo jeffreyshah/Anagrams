@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { getScrambledDailyWord, getUnscrambledDailyWord, checkAnyWord } from "../server/game";
 import Confetti from "react-confetti";
+import { InputBox } from "../components";
+import AudioManager from "../utils/AudioManager";
 import "../style.css";
 
 /**
@@ -32,18 +34,13 @@ import "../style.css";
  * 
 */
 
-// Preloads sound files for use in the game
-let sounds: { brick: HTMLAudioElement; nuhuh: HTMLAudioElement; duhduh: HTMLAudioElement;
-              dailyplay: HTMLAudioElement };
-if (typeof window !== "undefined") {
-  // Ensure Audio is only initialized on the client
-  sounds = {
-    brick: new Audio("/sounds/boom.mp3"),
-    nuhuh: new Audio("/sounds/wrong.mp3"),
-    duhduh: new Audio("/sounds/pony.mp3"),
-    dailyplay: new Audio("/sounds/dailyplay.mp3")
-  };
-}
+// Defines sound files for use in the game
+const defaultSounds = {
+  brick: "/sounds/boom.mp3",
+  nuhuh: "/sounds/wrong.mp3",
+  duhduh: "/sounds/pony.mp3",
+  dailyplay: "/sounds/dailyplay.mp3",
+};
 
 const GamePage: React.FC = () => {
   const [letters, setLetters] = useState<string[]>([]);
@@ -53,21 +50,28 @@ const GamePage: React.FC = () => {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [attempts, setAttempts] = useState<number>(0);
   const [shake, setShake] = useState<boolean>(false);
-  // const [isWordValid, setIsWordValid] = useState<boolean | null>(null);
-  const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [showConfetti, setShowConfetti] = useState<boolean>(false); // State for confetti
   const [displayMessage, setDisplayMessage] = useState("");
-
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const audioManager = useMemo(() => {
+    // Only initialize audio manager if window exists (client-side)
+    if (typeof window !== 'undefined') {
+      const manager = new AudioManager();
+      manager.loadSounds(defaultSounds);
+      return manager;
+    }
+    // Return a dummy manager for server-side
+    return {
+      playSound: () => {},
+      pauseSound: () => {},
+      setCurrentTime: () => {},
+    };
+  }, []);
 
   useEffect(() => {
     document.title = "Daily Challenge \u2014 SCRAMBLED"; 
-  }, []);
-
-  useEffect(() => {
-    Object.values(sounds).forEach((audio) => {
-      audio.load(); 
-    });
-  }, []);
+  });
 
   /**
    * Fetch the daily scrambled word from the server.
@@ -90,11 +94,12 @@ const GamePage: React.FC = () => {
     };
     fetchWord();
 
-    sounds.dailyplay.currentTime = 0; 
-    sounds.dailyplay.play().catch((error) =>
-      console.error("Error playing gameplay audio:", error)
-    );
-  }, []);
+    if (typeof window !== 'undefined' && audioManager.playSound) {
+      audioManager.playSound("dailyplay", { 
+        loop: true, 
+      });
+    }
+  }, [audioManager]);
 
   /**
    * Ensures the first input field is focused when the scrambled word changes.
@@ -166,34 +171,31 @@ const GamePage: React.FC = () => {
         formedWord.length === scrambledWord.length &&
         (await checkAnyWord(formedWord, scrambledWord) || formedWord === answer);
   
-      // setIsWordValid(isValid);
-  
       if (isValid) {
         setDisplayMessage("You unscrambled the word!");
         setAttempts((prev) => prev + 1);
         setIsGameOver(true);
-        sounds.dailyplay.pause();
-        setShowConfetti(true); 
+        setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 26000);
-        sounds.duhduh.play().catch((error) => console.error("Error playing audio:", error));
+
+        audioManager.pauseSound("dailyplay");
+        audioManager.playSound("duhduh");
+
       } else if (formedWord.length < 7) {
         setDisplayMessage("Enter a 7 letter word!");
-        sounds.nuhuh.currentTime = 0;
-        sounds.nuhuh.play().catch((error) =>
-          console.error("Error playing audio:", error)
-        );
+        audioManager.setCurrentTime("nuhuh", 0);
+        audioManager.playSound("nuhuh");
       } else {
         setDisplayMessage("Try Again!");
         triggerShake();
         if (formedWord.length === scrambledWord.length) {
           setAttempts((prev) => prev + 1);
-          sounds.brick.currentTime = 0; 
-          sounds.brick.play().catch((error) => console.error("Error playing audio:", error));
+          audioManager.setCurrentTime("brick", 0);
+          audioManager.playSound("brick");
         }
         else {
-          sounds.nuhuh.volume = 0.5;
-          sounds.nuhuh.currentTime = 0; 
-          sounds.nuhuh.play().catch((error) => console.error("Error playing audio:", error));
+          audioManager.setCurrentTime("nuhuh", 0);
+          audioManager.playSound("nuhuh");
         }
         setLetters(Array(scrambledWord.length).fill(""));
         inputRefs.current[0]?.focus();
@@ -211,26 +213,22 @@ const GamePage: React.FC = () => {
       <button className="home-button" onClick={() => (window.location.href = "/")}>
         <i className="fas fa-home"></i>
       </button>
-      <h1 className="game-title">
+      <h1 className="page-title">
         SCRAMB<span className="tilted-letter">L</span>ED
       </h1>
       <div className={`game-content ${shake ? "shake" : ""}`}>
         <h2 className="game-word">{scrambledWord}</h2>
         <div className="input-boxes">
           {letters.map((letter, index) => (
-            <input
-              key={index}
-              type="text"
-              value={letter}
-              maxLength={1}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
-              onChange={(e) => handleInputChange(e, index)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
-              disabled={isGameOver}
-              className={`game-input ${shake ? "shake" : ""}`}
-              autoFocus={index === currentIndex}
+            <InputBox
+            key={index} 
+            value={letter} 
+            onChange={(e) => handleInputChange(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            isDisabled={isGameOver} isFocused={index === currentIndex}
+            inputRef={(el) => {
+              inputRefs.current[index] = el;
+            }}
             />
           ))}
         </div>
