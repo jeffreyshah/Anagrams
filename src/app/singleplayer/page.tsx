@@ -65,6 +65,7 @@ const Singleplayer: React.FC = () => {
   /**
    * Load audio files into AudioManager instance
    */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const audioManager = new AudioManager();
   useEffect(() => {
     audioManager.loadSounds(defaultSounds);
@@ -114,6 +115,7 @@ const Singleplayer: React.FC = () => {
    */
   useEffect(() => {
     resetGame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
  }, []); 
  
 
@@ -188,7 +190,7 @@ const Singleplayer: React.FC = () => {
           audioManager.playSound(audio);
         } 
     }
-  }, [isGameOver, score]);
+  }, [isGameOver, score, audioManager]);
 
   /** Update the player's screen as they enter characters
    * - Move cursor to the next text box for each valid letter entered.

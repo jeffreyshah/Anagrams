@@ -24,7 +24,7 @@ class AudioManager {
    */ 
 
   playSound(key: string, options: { loop?: boolean} = {}) {
-    let audio = this.sounds[key];
+    const audio = this.sounds[key];
     if (audio) {
         audio.loop = options.loop || false;
         audio.play().catch((error) => {

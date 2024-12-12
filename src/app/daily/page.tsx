@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { getScrambledDailyWord, getUnscrambledDailyWord, checkAnyWord } from "../server/game";
 import Confetti from "react-confetti";
-import { InputBox, GameStats, Scoreboard, TimerDisplay } from "../components";
+import { InputBox } from "../components";
 import AudioManager from "../utils/AudioManager";
 import "../style.css";
 
@@ -71,7 +71,7 @@ const GamePage: React.FC = () => {
 
   useEffect(() => {
     document.title = "Daily Challenge \u2014 SCRAMBLED"; 
-  }, []);
+  });
 
   /**
    * Fetch the daily scrambled word from the server.
@@ -99,7 +99,7 @@ const GamePage: React.FC = () => {
         loop: true, 
       });
     }
-  }, []);
+  }, [audioManager]);
 
   /**
    * Ensures the first input field is focused when the scrambled word changes.
